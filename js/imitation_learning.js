@@ -42,25 +42,59 @@ class ImitationLearning {
      * Update model parameters from UI
      */
     updateParameters() {
-        this.learningRate =
-            parseFloat(
-                document.getElementById("imitationLearningRateInput").value,
-            ) || 0.01;
-        this.batchSize =
-            parseInt(document.getElementById("batchSizeInput").value) || 32;
-        this.maxEpochs =
-            parseInt(document.getElementById("epochsInput").value) || 100;
-        this.noiseFactor =
-            parseFloat(document.getElementById("noiseFactorInput").value) ||
-            0.1;
+        const lrElement = document.getElementById("imitationLearningRateInput");
+        if (lrElement) {
+            const parsedLR = parseFloat(lrElement.value);
+            this.learningRate = !isNaN(parsedLR) ? parsedLR : this.learningRate;
+        } else {
+            console.warn("Element with ID 'imitationLearningRateInput' not found. Using current learning rate.");
+        }
 
-        // Parse hidden layers
-        const hiddenLayersStr =
-            document.getElementById("hiddenLayersInput").value || "128,64,32";
-        this.hiddenLayers = hiddenLayersStr
-            .split(",")
-            .map((layer) => parseInt(layer.trim()))
-            .filter((n) => !isNaN(n));
+        const batchSizeElement = document.getElementById("batchSizeInput");
+        if (batchSizeElement) {
+            const parsedBS = parseInt(batchSizeElement.value);
+            this.batchSize = !isNaN(parsedBS) ? parsedBS : this.batchSize;
+        } else {
+            console.warn("Element with ID 'batchSizeInput' not found. Using current batch size.");
+        }
+
+        const epochsElement = document.getElementById("epochsInput");
+        if (epochsElement) {
+            const parsedEpochs = parseInt(epochsElement.value);
+            this.maxEpochs = !isNaN(parsedEpochs) ? parsedEpochs : this.maxEpochs;
+        } else {
+            console.warn("Element with ID 'epochsInput' not found. Using current max epochs.");
+        }
+
+        const noiseFactorElement = document.getElementById("noiseFactorInput");
+        if (noiseFactorElement) {
+            const parsedNF = parseFloat(noiseFactorElement.value);
+            this.noiseFactor = !isNaN(parsedNF) ? parsedNF : this.noiseFactor;
+        } else {
+            console.warn("Element with ID 'noiseFactorInput' not found. Using current noise factor.");
+        }
+
+        const hiddenLayersElement = document.getElementById("hiddenLayersInput");
+        if (hiddenLayersElement) {
+            const hiddenLayersStr = hiddenLayersElement.value;
+            if (hiddenLayersStr) {
+                const parsedHL = hiddenLayersStr
+                    .split(",")
+                    .map((layer) => parseInt(layer.trim()))
+                    .filter((n) => !isNaN(n) && n > 0); // Also ensure layers are positive integers
+                if (parsedHL.length > 0) {
+                    this.hiddenLayers = parsedHL;
+                } else {
+                    console.warn("Hidden layers string from 'hiddenLayersInput' resulted in empty or invalid array. Using current hidden layers.");
+                }
+            } else {
+                 // If value is empty string, arguably we should keep current, or use a default.
+                 // For now, keeping current if string is empty.
+                console.warn("Element 'hiddenLayersInput' has empty value. Using current hidden layers.");
+            }
+        } else {
+            console.warn("Element with ID 'hiddenLayersInput' not found. Using current hidden layers.");
+        }
 
         // Reinitialize model with new parameters
         this.initializeModel();
