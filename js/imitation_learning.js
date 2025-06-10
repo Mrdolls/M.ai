@@ -505,24 +505,33 @@ class ImitationLearning {
      */
     saveModel() {
         if (!this.model) {
-            console.error("No model to save");
+            console.error("ImitationLearning: No model to save");
             return null;
         }
-
+        const modelVersion = "1.0.0";
         try {
-            return {
-                modelData: this.model.toJSON(),
+            const modelData = {
+                modelType: "ImitationLearning",
+                version: modelVersion,
+                timestamp: Date.now(),
                 parameters: {
                     hiddenLayers: this.hiddenLayers,
                     learningRate: this.learningRate,
                     batchSize: this.batchSize,
                     maxEpochs: this.maxEpochs,
                     noiseFactor: this.noiseFactor,
+                    validationSplit: this.validationSplit,
                 },
-                trainingHistory: this.trainingHistory,
+                network: this.model.toJSON(),
+                trainingState: {
+                    trainingHistory: this.trainingHistory,
+                    currentEpoch: this.currentEpoch,
+                }
             };
+            console.log('ImitationLearning model saved successfully.');
+            return modelData;
         } catch (error) {
-            console.error("Error saving model:", error);
+            console.error("Error saving ImitationLearning model:", error);
             return null;
         }
     }
@@ -532,30 +541,60 @@ class ImitationLearning {
      */
     loadModel(modelData) {
         try {
-            this.model = new brain.NeuralNetwork();
-            this.model.fromJSON(modelData.modelData);
+            if (!modelData || !modelData.modelType || modelData.modelType !== "ImitationLearning") {
+                console.error('Invalid or incompatible model data format for ImitationLearning.');
+                return false;
+            }
 
+            console.log(`Loading ImitationLearning model version: ${modelData.version || 'unknown'}`);
+            if (modelData.version !== "1.0.0") { // Basic version check
+                console.warn(`Attempting to load model version ${modelData.version}, current version is 1.0.0. Compatibility issues may arise.`);
+            }
+
+            // Restore parameters
             if (modelData.parameters) {
-                this.hiddenLayers =
-                    modelData.parameters.hiddenLayers || this.hiddenLayers;
-                this.learningRate =
-                    modelData.parameters.learningRate || this.learningRate;
-                this.batchSize =
-                    modelData.parameters.batchSize || this.batchSize;
-                this.maxEpochs =
-                    modelData.parameters.maxEpochs || this.maxEpochs;
-                this.noiseFactor =
-                    modelData.parameters.noiseFactor || this.noiseFactor;
+                const params = modelData.parameters;
+                this.hiddenLayers = params.hiddenLayers !== undefined ? params.hiddenLayers : this.hiddenLayers;
+                this.learningRate = params.learningRate !== undefined ? params.learningRate : this.learningRate;
+                this.batchSize = params.batchSize !== undefined ? params.batchSize : this.batchSize;
+                this.maxEpochs = params.maxEpochs !== undefined ? params.maxEpochs : this.maxEpochs;
+                this.noiseFactor = params.noiseFactor !== undefined ? params.noiseFactor : this.noiseFactor;
+                this.validationSplit = params.validationSplit !== undefined ? params.validationSplit : this.validationSplit;
             }
 
-            if (modelData.trainingHistory) {
-                this.trainingHistory = modelData.trainingHistory;
+            // Initialize model if it doesn't exist, then load from JSON
+            // Note: initializeModel() resets parameters like hiddenLayers, learningRate to its defaults
+            // So, we restore parameters first, then ensure model is ready.
+            // If parameters that define network structure (like hiddenLayers) are changed,
+            // initializeModel() should ideally be called AFTER setting them so it uses new ones.
+            // However, brain.js fromJSON should reconstruct the network including its structure.
+            // Let's create a new instance directly before fromJSON to be safe.
+
+            this.model = new brain.NeuralNetwork(); // Create a new instance
+
+            if (modelData.network) {
+                this.model.fromJSON(modelData.network);
+            } else {
+                console.warn("No network data found in saved ImitationLearning model. Model remains a new instance.");
+                // Optionally, re-initialize with current parameters if no network data:
+                // this.initializeModel();
             }
 
-            console.log("Imitation learning model loaded successfully");
+            // Restore training state
+            if (modelData.trainingState) {
+                this.trainingHistory = modelData.trainingState.trainingHistory || [];
+                this.currentEpoch = modelData.trainingState.currentEpoch || 0;
+            } else {
+                this.trainingHistory = [];
+                this.currentEpoch = 0;
+            }
+
+            console.log("ImitationLearning model loaded successfully.");
             return true;
         } catch (error) {
-            console.error("Error loading model:", error);
+            console.error("Error loading ImitationLearning model:", error);
+            // If loading failed, it might be good to reset to a clean state
+            this.initializeModel(); // Reset to default initialized state
             return false;
         }
     }
