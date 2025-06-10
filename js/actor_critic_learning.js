@@ -69,21 +69,50 @@ class ActorCriticLearning {
      * Clone a neural network
      */
     cloneNetwork(sourceNetwork) {
+        let sourceJson = null; // Define sourceJson outside try to be available in catch
         try {
-            const newNetwork = new brain.NeuralNetwork({
-                hiddenLayers: [256, 128, 64],
-                learningRate: this.learningRate,
-                activation: sourceNetwork === this.actorNetwork ? 'sigmoid' : 'relu'
-            });
-
-            if (sourceNetwork) {
-                const json = sourceNetwork.toJSON();
-                newNetwork.fromJSON(json);
+            if (!sourceNetwork) {
+                console.error('Source network is null, cannot clone.');
+                return null;
             }
+
+            sourceJson = sourceNetwork.toJSON(); // Get the full JSON of the source network
+
+            // Determine if the source is an actor-like or critic-like network
+            const isActorType = (sourceNetwork === this.actorNetwork || sourceNetwork === this.targetActorNetwork);
+
+            // Prepare construction options, primarily deriving from sourceJson.options
+            // Fallback to root properties of sourceJson if not in sourceJson.options
+            const constructionOptions = {
+                learningRate: this.learningRate, // Use current instance's LR
+                activation: isActorType ? 'sigmoid' : 'relu',
+                hiddenLayers: sourceJson.options && sourceJson.options.hiddenLayers ? sourceJson.options.hiddenLayers : sourceJson.hiddenLayers,
+                inputSize: sourceJson.options && sourceJson.options.inputSize ? sourceJson.options.inputSize : sourceJson.inputSize,
+                outputSize: sourceJson.options && sourceJson.options.outputSize ? sourceJson.options.outputSize : sourceJson.outputSize
+            };
+
+            if (isActorType) {
+                constructionOptions.outputActivation = 'softmax';
+            }
+
+            // Log if crucial options are missing, as brain.js constructor might fail or create a differently structured network
+            if (!constructionOptions.hiddenLayers || !constructionOptions.inputSize || !constructionOptions.outputSize) {
+                console.warn('Cloning network: One or more structural parameters (hiddenLayers, inputSize, outputSize) are undefined. Constructor might rely on defaults or fromJSON to set them.', constructionOptions, sourceJson);
+            }
+
+            // Create a new network.
+            // Pass only the necessary structural and activation options to the constructor.
+            // fromJSON will handle the rest (weights, biases, and potentially overriding some options if they are part of the JSON structure it expects).
+            const newNetwork = new brain.NeuralNetwork(constructionOptions);
+
+            // Apply the full state from the source network's JSON
+            // This will set weights, biases, and potentially other specific options stored in the JSON.
+            newNetwork.fromJSON(sourceJson);
 
             return newNetwork;
         } catch (error) {
-            console.error('Error cloning network:', error);
+            // Log the error and the JSON that might have caused it for easier debugging
+            console.error('Error cloning network:', error, sourceJson || 'sourceNetwork is null or sourceJson could not be generated');
             return null;
         }
     }
@@ -92,13 +121,48 @@ class ActorCriticLearning {
      * Update parameters from UI
      */
     updateParameters() {
-        this.learningRate = parseFloat(document.getElementById('actorCriticLearningRateInput')?.value) || 0.001;
-        this.batchSize = parseInt(document.getElementById('actorCriticBatchSizeInput')?.value) || 64;
-        this.gamma = parseFloat(document.getElementById('discountFactorInput')?.value) || 0.99;
-        this.tau = parseFloat(document.getElementById('softUpdateInput')?.value) || 0.01;
-        this.entropyCoefficient = parseFloat(document.getElementById('entropyCoeffInput')?.value) || 0.01;
+        const lrElement = document.getElementById('actorCriticLearningRateInput');
+        if (lrElement) {
+            const parsedLR = parseFloat(lrElement.value);
+            this.learningRate = !isNaN(parsedLR) ? parsedLR : this.learningRate;
+        } else {
+            console.warn("Element with ID 'actorCriticLearningRateInput' not found. Using current learning rate.");
+        }
 
-        // Reinitialize networks with new parameters
+        const batchSizeElement = document.getElementById('actorCriticBatchSizeInput');
+        if (batchSizeElement) {
+            const parsedBS = parseInt(batchSizeElement.value);
+            this.batchSize = !isNaN(parsedBS) ? parsedBS : this.batchSize;
+        } else {
+            console.warn("Element with ID 'actorCriticBatchSizeInput' not found. Using current batch size.");
+        }
+
+        const gammaElement = document.getElementById('actorCriticDiscountFactorInput'); // Updated ID
+        if (gammaElement) {
+            const parsedGamma = parseFloat(gammaElement.value);
+            this.gamma = !isNaN(parsedGamma) ? parsedGamma : this.gamma;
+        } else {
+            console.warn("Element with ID 'actorCriticDiscountFactorInput' not found. Using current gamma.");
+        }
+
+        const tauElement = document.getElementById('softUpdateInput');
+        if (tauElement) {
+            const parsedTau = parseFloat(tauElement.value);
+            this.tau = !isNaN(parsedTau) ? parsedTau : this.tau;
+        } else {
+            console.warn("Element with ID 'softUpdateInput' not found. Using current tau.");
+        }
+
+        const entropyCoeffElement = document.getElementById('entropyCoeffInput');
+        if (entropyCoeffElement) {
+            const parsedEntropy = parseFloat(entropyCoeffElement.value);
+            this.entropyCoefficient = !isNaN(parsedEntropy) ? parsedEntropy : this.entropyCoefficient;
+        } else {
+            console.warn("Element with ID 'entropyCoeffInput' not found. Using current entropy coefficient.");
+        }
+
+        // Reinitialize networks with new parameters only if any relevant parameter changed.
+        // For simplicity here, we still reinitialize. A more complex check could compare old vs new values.
         this.initializeNetworks();
     }
 
