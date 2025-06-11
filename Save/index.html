@@ -13,7 +13,15 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <style>
                 /* Custom styles for the canvas to ensure it fits well */
-                /* Le canvas et ses styles associés ont été retirés */
+                canvas {
+                        background-color: #333;
+                        border: 2px solid #6366f1;
+                        border-radius: 8px;
+                        display: block;
+                        margin: 0 auto;
+                        width: 100%;
+                        height: 100%;
+                }
 
                 body {
                         font-family: 'Inter', sans-serif;
@@ -239,10 +247,10 @@
                         </div>
                 </div>
 
-                <!-- La zone du jeu (canvas) a été complètement retirée de cette section -->
-                <!-- <div class="flex-1 flex items-center justify-center">
+                <!-- Game Area -->
+                <div class="flex-1 flex items-center justify-center">
                         <canvas id="gameCanvas" width="750" height="750"></canvas>
-                </div> -->
+                </div>
         </div>
 
         <!-- Settings Panel -->
@@ -543,9 +551,8 @@
                 // Main application logic
                 class NeuralNetworkTrainer {
                         constructor() {
-                                // Le canvas et son contexte ne sont plus nécessaires
-                                // this.canvas = document.getElementById('gameCanvas');
-                                // this.ctx = this.canvas.getContext('2d');
+                                this.canvas = document.getElementById('gameCanvas');
+                                this.ctx = this.canvas.getContext('2d');
                                 this.currentLearningMethod = 'genetic';
                                 this.isTraining = false;
                                 this.currentWave = 0;
@@ -558,21 +565,15 @@
                                 this.performanceComparator = new PerformanceComparator();
                                 this.networkManager = new NeuralNetworkManager();
 
-                                // Game state - désormais un placeholder car le jeu n'est plus affiché
+                                // Game state
                                 this.gameState = {
-                                        agentX: 375, // Valeurs par défaut pour les calculs de features
-                                        agentY: 375,
-                                        velocityX: 0,
-                                        velocityY: 0,
-                                        circles: [{ x: 100, y: 100, radius: 10, id: 'c1' }, { x: 600, y: 600, radius: 10, id: 'c2' }], // Exemples de cercles
+                                        agents: [],
+                                        circles: [],
                                         gameWidth: 750,
                                         gameHeight: 750,
                                         squareSize: 25,
                                         circleRadius: 10,
-                                        initialCircles: 5,
-                                        score: 0,
-                                        timeRemaining: 5000,
-                                        maxTime: 5000
+                                        initialCircles: 5
                                 };
 
                                 this.initializeEventListeners();
@@ -584,7 +585,7 @@
                                 document.getElementById('geneticTab').addEventListener('click', () => this.switchLearningMethod('genetic'));
                                 document.getElementById('qlearningTab').addEventListener('click', () => this.switchLearningMethod('qlearning'));
                                 document.getElementById('imitationTab').addEventListener('click', () => this.switchLearningMethod('imitation'));
-                                document.getElementById('actorCriticTab').addEventListener('click', () => this.switchLearningMethod('actorCritic'));
+                                document.getElementById('actorCriticTab').addEventListener('click', () => this.switchLearningMethod('actorcritic'));
 
                                 // Control buttons
                                 document.getElementById('startButton').addEventListener('click', () => this.toggleTraining());
@@ -609,10 +610,10 @@
                                 document.getElementById('loadJsonToInd0Button').addEventListener('click', () => this.loadJsonToIndividual());
                                 document.getElementById('downloadJsonButton').addEventListener('click', () => this.downloadWeights());
 
-                                // Les écouteurs d'événements du clavier sur le canvas ne sont plus nécessaires
-                                // this.canvas.addEventListener('keydown', (e) => this.handleKeyDown(e));
-                                // this.canvas.addEventListener('keyup', (e) => this.handleKeyUp(e));
-                                // this.canvas.tabIndex = 0; // Make canvas focusable
+                                // Canvas for demonstration recording
+                                this.canvas.addEventListener('keydown', (e) => this.handleKeyDown(e));
+                                this.canvas.addEventListener('keyup', (e) => this.handleKeyUp(e));
+                                this.canvas.tabIndex = 0; // Make canvas focusable
 
                                 // Parameter change listeners
                                 this.setupParameterListeners();
@@ -646,7 +647,7 @@
                                 if (geneticParams) geneticParams.style.display = method === 'genetic' ? 'block' : 'none';
                                 if (qlearningParams) qlearningParams.style.display = method === 'qlearning' ? 'block' : 'none';
                                 if (imitationParams) imitationParams.style.display = method === 'imitation' ? 'block' : 'none';
-                                if (actorCriticParams) actorCriticParams.style.display = method === 'actorCritic' ? 'block' : 'none';
+                                if (actorCriticParams) actorCriticParams.style.display = method === 'actorcritic' ? 'block' : 'none';
 
                                 this.updateUI();
                         }
@@ -676,7 +677,7 @@
                                         case 'imitation':
                                                 this.startImitationTraining();
                                                 break;
-                                        case 'actorCritic':
+                                        case 'actorcritic':
                                                 this.startActorCriticTraining();
                                                 break;
                                 }
@@ -702,8 +703,7 @@
 
                         startImitationTraining() {
                                 if (this.demonstrationRecorder.demonstrations.length === 0) {
-                                        // Utiliser une boîte de dialogue personnalisée au lieu de alert()
-                                        this.showMessage('Aucune démonstration disponible. Veuillez d\'abord enregistrer ou charger des démonstrations.', 'warning');
+                                        alert('Aucune démonstration disponible. Veuillez d\'abord enregistrer ou charger des démonstrations.');
                                         this.stopTraining();
                                         return;
                                 }
@@ -723,8 +723,7 @@
                                 document.getElementById('recordDemoButton').disabled = true;
                                 document.getElementById('stopRecordingButton').disabled = false;
                                 document.getElementById('recordingIndicator').style.display = 'inline';
-                                // Puisque le canvas est supprimé, nous ne pouvons pas le focus
-                                // this.canvas.focus();
+                                this.canvas.focus();
                         }
 
                         stopRecording() {
@@ -762,8 +761,7 @@
                                                         this.updateDemoCount();
                                                         document.getElementById('saveDemoButton').disabled = false;
                                                 } catch (error) {
-                                                        // Utiliser une boîte de dialogue personnalisée au lieu de alert()
-                                                        this.showMessage('Erreur lors du chargement du fichier de démonstration: ' + error.message, 'error');
+                                                        alert('Erreur lors du chargement du fichier de démonstration: ' + error.message);
                                                 }
                                         };
                                         reader.readAsText(file);
@@ -813,7 +811,7 @@
                                                                                 document.getElementById('statusMessage').textContent = 'Poids imitation chargés';
                                                                         }
                                                                         break;
-                                                                case 'actorCritic':
+                                                                case 'actorcritic':
                                                                         if (this.actorCriticLearning.loadModel(data)) {
                                                                                 console.log('Weights loaded for Actor-Critic');
                                                                                 document.getElementById('statusMessage').textContent = 'Poids Actor-Critic chargés';
@@ -824,25 +822,24 @@
                                                         document.getElementById('downloadJsonButton').disabled = false;
                                                 } catch (error) {
                                                         console.error('Error loading weights:', error);
-                                                        this.showMessage('Erreur lors du chargement des poids', 'error');
+                                                        alert('Erreur lors du chargement des poids');
                                                 }
                                         };
                                         reader.readAsText(file);
                                 }
                         }
 
-                        // Les fonctions de gestion des événements clavier ne sont plus nécessaires sur le canvas
-                        // handleKeyDown(event) {
-                        //         if (this.demonstrationRecorder.isRecording) {
-                        //                 this.demonstrationRecorder.recordAction(event.key, 'keydown');
-                        //         }
-                        // }
+                        handleKeyDown(event) {
+                                if (this.demonstrationRecorder.isRecording) {
+                                        this.demonstrationRecorder.recordAction(event.key, 'keydown');
+                                }
+                        }
 
-                        // handleKeyUp(event) {
-                        //         if (this.demonstrationRecorder.isRecording) {
-                        //                 this.demonstrationRecorder.recordAction(event.key, 'keyup');
-                        //         }
-                        // }
+                        handleKeyUp(event) {
+                                if (this.demonstrationRecorder.isRecording) {
+                                        this.demonstrationRecorder.recordAction(event.key, 'keyup');
+                                }
+                        }
 
                         toggleSettings() {
                                 const panel = document.getElementById('settingsPanel');
@@ -871,13 +868,13 @@
                                         { id: 'populationSizeInput', value: 50 },
                                         { id: 'mutationRateInput', value: 0.1 },
                                         { id: 'crossoverRateInput', value: 0.8 },
-                                        // { id: 'elitismInput', value: 5 }, // Retiré si non présent dans le HTML
+                                        { id: 'elitismInput', value: 5 },
                                         // Q-Learning parameters
-                                        { id: 'learningRateInput', value: 0.1 }, // Correction de l'ID 'qLearningRateInput' en 'learningRateInput' pour la section des paramètres Q-Learning
-                                        { id: 'epsilonInput', value: 0.1 }, // Correction de l'ID, la valeur par défaut a été ajustée pour correspondre au HTML
-                                        { id: 'epsilonDecayInput', value: 0.005 }, // Correction de l'ID, la valeur par défaut a été ajustée pour correspondre au HTML
-                                        { id: 'discountFactorInput', value: 0.95 }, // Correction de l'ID, la valeur par défaut a été ajustée pour correspondre au HTML
-                                        // { id: 'experienceReplayInput', value: 10000 }, // Retiré si non présent dans le HTML
+                                        { id: 'qLearningRateInput', value: 0.1 },
+                                        { id: 'epsilonInput', value: 1.0 },
+                                        { id: 'epsilonDecayInput', value: 0.995 },
+                                        { id: 'gammaInput', value: 0.99 },
+                                        { id: 'experienceReplayInput', value: 10000 },
                                         // Imitation parameters
                                         { id: 'imitationLearningRateInput', value: 0.01 },
                                         { id: 'batchSizeInput', value: 32 },
@@ -887,7 +884,7 @@
                                         // Actor-Critic parameters
                                         { id: 'actorCriticLearningRateInput', value: 0.001 },
                                         { id: 'actorCriticBatchSizeInput', value: 64 },
-                                        { id: 'actorCriticDiscountFactorInput', value: 0.99 }, // ID correct
+                                        { id: 'discountFactorInput', value: 0.99 },
                                         { id: 'softUpdateInput', value: 0.01 },
                                         { id: 'entropyCoeffInput', value: 0.01 }
                                 ];
@@ -904,13 +901,9 @@
                                 console.log('Settings reset to defaults');
                         }
 
-
                         setupParameterListeners() {
                                 // Game parameter listeners
-                                const gameParams = ['gameSizeInput', 'squareSizeInput', 'circleRadiusInput', 'initialCirclesInput', 'waveDurationInput', 'maxWavesInput',
-                                        // Rewards & Penalties
-                                        'rewardCollectCircleInput', 'penaltyIdleInput', 'penaltyWallCollisionInput', 'rewardMoveTowardsCircleInput', 'newRewardDirectHeadingInput',
-                                        'newPenaltyWrongHeadingInput', 'maxStepsWithoutCollectionInput', 'penaltyNoCollectionSoonInput'];
+                                const gameParams = ['gameSizeInput', 'squareSizeInput', 'circleRadiusInput', 'initialCirclesInput', 'waveDurationInput', 'maxWavesInput'];
                                 gameParams.forEach(id => {
                                         const element = document.getElementById(id);
                                         if (element) {
@@ -920,10 +913,10 @@
 
                                 // Learning method parameter listeners
                                 const learningParams = [
-                                        'populationSizeInput', 'mutationRateInput', 'crossoverRateInput',
-                                        'learningRateInput', 'discountFactorInput', 'epsilonInput', 'epsilonDecayInput', // Q-Learning
-                                        'imitationLearningRateInput', 'batchSizeInput', 'epochsInput', 'hiddenLayersInput', 'noiseFactorInput', // Imitation
-                                        'actorCriticLearningRateInput', 'actorCriticBatchSizeInput', 'actorCriticDiscountFactorInput', 'softUpdateInput', 'entropyCoeffInput' // Actor-Critic
+                                        'populationSizeInput', 'mutationRateInput', 'crossoverRateInput', 'elitismInput',
+                                        'qLearningRateInput', 'epsilonInput', 'epsilonDecayInput', 'gammaInput', 'experienceReplayInput',
+                                        'imitationLearningRateInput', 'batchSizeInput', 'epochsInput', 'hiddenLayersInput', 'noiseFactorInput',
+                                        'actorCriticLearningRateInput', 'actorCriticBatchSizeInput', 'discountFactorInput', 'softUpdateInput', 'entropyCoeffInput'
                                 ];
                                 learningParams.forEach(id => {
                                         const element = document.getElementById(id);
@@ -935,11 +928,10 @@
 
                         applyParameterChanges() {
                                 // Update game parameters
-                                // Puisque le canvas est retiré, les mises à jour directes de la taille du canvas ne sont plus nécessaires.
-                                // Cependant, les valeurs des paramètres du jeu peuvent toujours être utiles pour les calculs internes des modèles si nécessaire.
                                 const gameSizeElement = document.getElementById('gameSizeInput');
-                                this.gameState.gameWidth = gameSizeElement ? parseInt(gameSizeElement.value) : 750;
-                                this.gameState.gameHeight = gameSizeElement ? parseInt(gameSizeElement.value) : 750;
+                                const gameSize = gameSizeElement ? parseInt(gameSizeElement.value) : 750;
+                                this.gameState.gameWidth = gameSize;
+                                this.gameState.gameHeight = gameSize;
 
                                 const squareSizeElement = document.getElementById('squareSizeInput');
                                 this.gameState.squareSize = squareSizeElement ? parseInt(squareSizeElement.value) : 25;
@@ -949,6 +941,12 @@
 
                                 const initialCirclesElement = document.getElementById('initialCirclesInput');
                                 this.gameState.initialCircles = initialCirclesElement ? parseInt(initialCirclesElement.value) : 5;
+
+                                // Update canvas size
+                                if (this.canvas) {
+                                        this.canvas.width = gameSize;
+                                        this.canvas.height = gameSize;
+                                }
 
                                 // Update max waves
                                 const maxWavesElement = document.getElementById('maxWavesInput');
@@ -960,15 +958,12 @@
 
                                 // Update learning method parameters
                                 try {
-                                        // Ces méthodes doivent être appelées pour que les modules internes de Brain.js mettent à jour leurs paramètres
                                         if (this.imitationLearning && typeof this.imitationLearning.updateParameters === 'function') {
                                                 this.imitationLearning.updateParameters();
                                         }
                                         if (this.actorCriticLearning && typeof this.actorCriticLearning.updateParameters === 'function') {
                                                 this.actorCriticLearning.updateParameters();
                                         }
-                                        // Pour Q-Learning, les paramètres sont lus directement dans runQLearning ou dans la méthode du module Q-Learning si elle existe.
-                                        // Le NeuralNetworkManager pourrait avoir une méthode updateParameters pour Q-Learning s'il y avait un module Q-Learning dédié.
                                 } catch (error) {
                                         console.warn('Error updating learning parameters:', error);
                                 }
@@ -1000,45 +995,16 @@
                                         initialCircles: document.getElementById('initialCirclesInput').value,
                                         waveDuration: document.getElementById('waveDurationInput').value,
                                         maxWaves: document.getElementById('maxWavesInput').value,
-                                        rewardCollectCircle: document.getElementById('rewardCollectCircleInput').value,
-                                        penaltyIdle: document.getElementById('penaltyIdleInput').value,
-                                        penaltyWallCollision: document.getElementById('penaltyWallCollisionInput').value,
-                                        rewardMoveTowardsCircle: document.getElementById('rewardMoveTowardsCircleInput').value,
-                                        newRewardDirectHeading: document.getElementById('newRewardDirectHeadingInput').value,
-                                        newPenaltyWrongHeading: document.getElementById('newPenaltyWrongHeadingInput').value,
-                                        maxStepsWithoutCollection: document.getElementById('maxStepsWithoutCollectionInput').value,
-                                        penaltyNoCollectionSoon: document.getElementById('penaltyNoCollectionSoonInput').value,
-                                        // Genetic parameters
-                                        populationSize: document.getElementById('populationSizeInput').value,
-                                        mutationRate: document.getElementById('mutationRateInput').value,
-                                        crossoverRate: document.getElementById('crossoverRateInput').value,
-                                        // Q-Learning parameters
-                                        learningRate: document.getElementById('learningRateInput').value, // Corrected ID
-                                        discountFactor: document.getElementById('discountFactorInput').value, // Corrected ID
-                                        epsilon: document.getElementById('epsilonInput').value, // Corrected ID
-                                        epsilonDecay: document.getElementById('epsilonDecayInput').value, // Corrected ID
-                                        // Imitation Learning parameters
-                                        imitationLearningRate: document.getElementById('imitationLearningRateInput').value,
-                                        batchSize: document.getElementById('batchSizeInput').value,
-                                        epochs: document.getElementById('epochsInput').value,
-                                        hiddenLayers: document.getElementById('hiddenLayersInput').value,
-                                        noiseFactor: document.getElementById('noiseFactorInput').value,
-                                        // Actor-Critic parameters
-                                        actorCriticLearningRate: document.getElementById('actorCriticLearningRateInput').value,
-                                        actorCriticBatchSize: document.getElementById('actorCriticBatchSizeInput').value,
-                                        actorCriticDiscountFactor: document.getElementById('actorCriticDiscountFactorInput').value,
-                                        softUpdate: document.getElementById('softUpdateInput').value,
-                                        entropyCoeff: document.getElementById('entropyCoeffInput').value,
+                                        // Add more settings as needed
                                 };
                         }
-
 
                         loadJsonToIndividual() {
                                 const fileInput = document.getElementById('uploadWeightsFile');
                                 if (fileInput.files.length > 0) {
                                         this.handleWeightsFileLoad({ target: fileInput });
                                 } else {
-                                        this.showMessage('Veuillez d\'abord sélectionner un fichier JSON', 'info');
+                                        alert('Veuillez d\'abord sélectionner un fichier JSON');
                                 }
                         }
 
@@ -1070,7 +1036,7 @@
                                                 data = this.imitationLearning.saveModel();
                                                 filename = 'imitation_weights.json';
                                                 break;
-                                        case 'actorCritic':
+                                        case 'actorcritic':
                                                 const actorNetworkData = this.actorCriticLearning.actorNetwork ? this.actorCriticLearning.actorNetwork.toJSON() : null;
                                                 const criticNetworkData = this.actorCriticLearning.criticNetwork ? this.actorCriticLearning.criticNetwork.toJSON() : null;
                                                 data = { modelType: "ActorCriticLearning_BrainOnly", timestamp: Date.now(), networks: { actor: actorNetworkData, critic: criticNetworkData } };
@@ -1089,7 +1055,7 @@
                                         URL.revokeObjectURL(url);
                                         console.log('Weights downloaded successfully');
                                 } else {
-                                        this.showMessage('Aucun poids disponible à télécharger pour cette méthode', 'info');
+                                        alert('Aucun poids disponible à télécharger pour cette méthode');
                                 }
                         }
 
@@ -1218,42 +1184,73 @@
                                 }
                         }
 
-                        // Game rendering and logic methods - elles sont vides car le canvas a été retiré
-                        // La méthode render n'est plus appelée ni nécessaire.
+                        // Game rendering and logic methods
                         render() {
-                                // Aucune logique de rendu car le canvas a été retiré
-                        }
+                                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-                        // La boucle de jeu n'est plus nécessaire car il n'y a plus de rendu de jeu
-                        // gameLoop() {
-                        //         this.render();
-                        //         requestAnimationFrame(() => this.gameLoop());
-                        // }
+                                // Draw game background
+                                this.ctx.fillStyle = '#2d3748';
+                                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-                        // Fonction pour afficher des messages personnalisés au lieu de alert()
-                        showMessage(message, type = 'info') {
-                                const statusMessageElement = document.getElementById('statusMessage');
-                                if (statusMessageElement) {
-                                        statusMessageElement.textContent = message;
-                                        // Optionnel: changer la couleur du texte en fonction du type
-                                        statusMessageElement.className = 'font-bold'; // Réinitialise les classes
-                                        if (type === 'error') {
-                                                statusMessageElement.classList.add('text-red-400');
-                                        } else if (type === 'warning') {
-                                                statusMessageElement.classList.add('text-orange-400');
-                                        } else {
-                                                statusMessageElement.classList.add('text-yellow-400');
+                                // Draw grid for reference
+                                this.ctx.strokeStyle = '#4a5568';
+                                this.ctx.lineWidth = 1;
+                                for (let x = 0; x < this.canvas.width; x += 50) {
+                                        this.ctx.beginPath();
+                                        this.ctx.moveTo(x, 0);
+                                        this.ctx.lineTo(x, this.canvas.height);
+                                        this.ctx.stroke();
+                                }
+                                for (let y = 0; y < this.canvas.height; y += 50) {
+                                        this.ctx.beginPath();
+                                        this.ctx.moveTo(0, y);
+                                        this.ctx.lineTo(this.canvas.width, y);
+                                        this.ctx.stroke();
+                                }
+
+                                // Draw training method indicator
+                                this.ctx.fillStyle = '#e2e8f0';
+                                this.ctx.font = '16px Arial';
+                                this.ctx.textAlign = 'center';
+                                let methodText = '';
+                                switch (this.currentLearningMethod) {
+                                        case 'genetic': methodText = 'Algorithme Génétique'; break;
+                                        case 'qlearning': methodText = 'Q-Learning'; break;
+                                        case 'imitation': methodText = 'Apprentissage par Imitation'; break;
+                                        case 'actorcritic': methodText = 'Actor-Critic (Avancé)'; break;
+                                }
+                                this.ctx.fillText(methodText, this.canvas.width / 2, 30);
+
+                                // Draw agent placeholder
+                                if (this.isTraining) {
+                                        this.ctx.fillStyle = '#3b82f6';
+                                        const agentX = this.canvas.width / 2 + Math.sin(Date.now() / 1000) * 100;
+                                        const agentY = this.canvas.height / 2 + Math.cos(Date.now() / 1000) * 100;
+                                        this.ctx.fillRect(agentX - 12, agentY - 12, 25, 25);
+
+                                        // Draw circles as targets
+                                        this.ctx.fillStyle = '#10b981';
+                                        for (let i = 0; i < 5; i++) {
+                                                const angle = (Date.now() / 2000 + i * Math.PI * 2 / 5);
+                                                const circleX = this.canvas.width / 2 + Math.cos(angle) * 150;
+                                                const circleY = this.canvas.height / 2 + Math.sin(angle) * 150;
+                                                this.ctx.beginPath();
+                                                this.ctx.arc(circleX, circleY, 10, 0, Math.PI * 2);
+                                                this.ctx.fill();
                                         }
                                 }
-                                console.log(`Message (${type}): ${message}`);
+                        }
+
+                        gameLoop() {
+                                this.render();
+                                requestAnimationFrame(() => this.gameLoop());
                         }
                 }
 
                 // Initialize the application when DOM is loaded
                 document.addEventListener('DOMContentLoaded', () => {
                         const trainer = new NeuralNetworkTrainer();
-                        // La ligne suivante a été supprimée car gameLoop n'est plus nécessaire
-                        // trainer.gameLoop();
+                        trainer.gameLoop();
                 });
         </script>
 </body>

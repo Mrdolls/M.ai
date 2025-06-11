@@ -40,19 +40,28 @@ class ActorCriticLearning {
      */
     initializeNetworks() {
         try {
+            // Define network structures
+            const inputSize = 20; // Based on stateToFeatures
+            const actorOutputSize = 4; // Number of actions
+            const criticOutputSize = 1; // State value
+
             // Actor Network (Policy) - outputs action probabilities
             this.actorNetwork = new brain.NeuralNetwork({
+                inputSize: inputSize,
                 hiddenLayers: [256, 128, 64],
+                outputSize: actorOutputSize,
                 learningRate: this.learningRate,
-                activation: 'sigmoid',
+                activation: 'sigmoid', // Common for hidden layers in policy networks
                 outputActivation: 'softmax' // For probability distribution
             });
 
             // Critic Network (Value function) - outputs state value
             this.criticNetwork = new brain.NeuralNetwork({
+                inputSize: inputSize,
                 hiddenLayers: [256, 128, 64],
+                outputSize: criticOutputSize,
                 learningRate: this.learningRate,
-                activation: 'relu'
+                activation: 'relu' // Common for value networks
             });
 
             // Target networks for stability (Double DQN)
@@ -561,43 +570,20 @@ class ActorCriticLearning {
     }
 
     /**
-     * Save model to JSON
+     * Save model to JSON (simplified to only include the "brain" networks)
+     * @returns {object|null} The simplified model JSON or null on error.
      */
     saveModel() {
-        const modelVersion = "1.0.0";
         try {
             const modelData = {
-                modelType: "ActorCriticLearning",
-                version: modelVersion,
-                timestamp: Date.now(),
-                parameters: {
-                    learningRate: this.learningRate,
-                    gamma: this.gamma,
-                    epsilon: this.epsilon,
-                    epsilonDecay: this.epsilonDecay,
-                    epsilonMin: this.epsilonMin,
-                    tau: this.tau,
-                    entropyCoefficient: this.entropyCoefficient,
-                    maxExperienceSize: this.maxExperienceSize,
-                    batchSize: this.batchSize,
-                    advantageNormalization: this.advantageNormalization,
-                    prioritizedReplay: this.prioritizedReplay,
-                    doubleQLearning: this.doubleQLearning, // conceptual, but saved for info
-                    dueling: this.dueling, // conceptual, but saved for info
-                },
+                modelType: "ActorCriticLearning_BrainOnly", // Specific type for simplified format
                 networks: {
                     actor: this.actorNetwork ? this.actorNetwork.toJSON() : null,
                     critic: this.criticNetwork ? this.criticNetwork.toJSON() : null,
-                    targetActor: this.targetActorNetwork ? this.targetActorNetwork.toJSON() : null,
-                    targetCritic: this.targetCriticNetwork ? this.targetCriticNetwork.toJSON() : null,
-                },
-                trainingState: {
-                    trainingHistory: this.trainingHistory,
-                    trainingEpisode: this.trainingEpisode,
-                },
-                experienceBuffer: JSON.stringify(this.experience) // Serialize experience buffer
+                    // Target networks are auxiliary for training and not part of the deployed "brain"
+                }
             };
-            console.log('Actor-Critic model saved successfully.');
+            console.log('Actor-Critic model saved successfully (brain only).');
             return modelData;
         } catch (error) {
             console.error('Error saving Actor-Critic model:', error);
@@ -607,95 +593,87 @@ class ActorCriticLearning {
 
     /**
      * Load model from JSON
+     * @param {object} modelData - The model data to load.
+     * @returns {boolean} True if loaded successfully, false otherwise.
      */
     loadModel(modelData) {
         try {
-            if (!modelData || !modelData.modelType || modelData.modelType !== "ActorCriticLearning") {
+            if (!modelData || !modelData.modelType) {
                 console.error('Invalid or incompatible model data format for ActorCriticLearning.');
                 return false;
             }
 
-            console.log(`Loading Actor-Critic model version: ${modelData.version || 'unknown'}`);
-            if (modelData.version !== "1.0.0") {
-                console.warn(`Attempting to load model version ${modelData.version}, current version is 1.0.0. Compatibility issues may arise.`);
-            }
+            // ONLY handle the new "BrainOnly" model type
+            if (modelData.modelType === "ActorCriticLearning_BrainOnly") {
+                console.log('Loading Actor-Critic model (BrainOnly format)...');
 
-            // Restore parameters
-            if (modelData.parameters) {
-                const params = modelData.parameters;
-                this.learningRate = params.learningRate !== undefined ? params.learningRate : this.learningRate;
-                this.gamma = params.gamma !== undefined ? params.gamma : this.gamma;
-                this.epsilon = params.epsilon !== undefined ? params.epsilon : this.epsilon;
-                this.epsilonDecay = params.epsilonDecay !== undefined ? params.epsilonDecay : this.epsilonDecay;
-                this.epsilonMin = params.epsilonMin !== undefined ? params.epsilonMin : this.epsilonMin;
-                this.tau = params.tau !== undefined ? params.tau : this.tau;
-                this.entropyCoefficient = params.entropyCoefficient !== undefined ? params.entropyCoefficient : this.entropyCoefficient;
-                this.maxExperienceSize = params.maxExperienceSize !== undefined ? params.maxExperienceSize : this.maxExperienceSize;
-                this.batchSize = params.batchSize !== undefined ? params.batchSize : this.batchSize;
-                this.advantageNormalization = params.advantageNormalization !== undefined ? params.advantageNormalization : this.advantageNormalization;
-                this.prioritizedReplay = params.prioritizedReplay !== undefined ? params.prioritizedReplay : this.prioritizedReplay;
-                this.doubleQLearning = params.doubleQLearning !== undefined ? params.doubleQLearning : this.doubleQLearning;
-                this.dueling = params.dueling !== undefined ? params.dueling : this.dueling;
-            }
+                // Ensure actorNetwork exists and is a brain.NeuralNetwork instance
+                if (!this.actorNetwork) {
+                    this.actorNetwork = new brain.NeuralNetwork(); // fromJSON will structure it
+                } else if (!(this.actorNetwork instanceof brain.NeuralNetwork)) {
+                    console.warn('this.actorNetwork was not a brain.NeuralNetwork instance. Re-initializing.');
+                    this.actorNetwork = new brain.NeuralNetwork();
+                }
 
-            // Initialize networks if they don't exist, then load from JSON
-            if (!this.actorNetwork) this.initializeNetworks(); // This will init all four
+                // Ensure criticNetwork exists and is a brain.NeuralNetwork instance
+                if (!this.criticNetwork) {
+                    this.criticNetwork = new brain.NeuralNetwork(); // fromJSON will structure it
+                } else if (!(this.criticNetwork instanceof brain.NeuralNetwork)) {
+                    console.warn('this.criticNetwork was not a brain.NeuralNetwork instance. Re-initializing.');
+                    this.criticNetwork = new brain.NeuralNetwork();
+                }
 
-            if (modelData.networks) {
-                if (modelData.networks.actor) {
+                let actorLoaded = false;
+                if (modelData.networks && modelData.networks.actor) {
                     this.actorNetwork.fromJSON(modelData.networks.actor);
+                    actorLoaded = true;
+                    console.log('Actor network loaded from BrainOnly model.');
                 } else {
-                    console.warn("No actor network data found in saved model. It remains initialized.");
+                    console.warn('No actor network data found in BrainOnly model.');
                 }
-                if (modelData.networks.critic) {
+
+                let criticLoaded = false;
+                if (modelData.networks && modelData.networks.critic) {
                     this.criticNetwork.fromJSON(modelData.networks.critic);
+                    criticLoaded = true;
+                    console.log('Critic network loaded from BrainOnly model.');
                 } else {
-                    console.warn("No critic network data found in saved model. It remains initialized.");
+                    console.warn('No critic network data found in BrainOnly model.');
                 }
-                if (modelData.networks.targetActor) {
-                    this.targetActorNetwork.fromJSON(modelData.networks.targetActor);
+
+                // Initialize target networks from loaded main networks
+                // This ensures target networks are consistent with the loaded main networks
+                if (this.actorNetwork && actorLoaded) {
+                    this.targetActorNetwork = this.cloneNetwork(this.actorNetwork);
                 } else {
-                    console.warn("No target actor network data found in saved model. It remains initialized.");
+                    this.targetActorNetwork = null; // Ensure it's null if actor not loaded
                 }
-                if (modelData.networks.targetCritic) {
-                    this.targetCriticNetwork.fromJSON(modelData.networks.targetCritic);
+                if (this.criticNetwork && criticLoaded) {
+                    this.targetCriticNetwork = this.cloneNetwork(this.criticNetwork);
                 } else {
-                    console.warn("No target critic network data found in saved model. It remains initialized.");
+                    this.targetCriticNetwork = null; // Ensure it's null if critic not loaded
                 }
+
+                // Reset training state and experience buffer as they are not saved in BrainOnly
+                this.experience = [];
+                this.trainingHistory = [];
+                this.trainingEpisode = 0;
+                this.epsilon = 1.0; // Epsilon should typically be reset on load for a new training session
+                this.avgReward = 0;
+                this.bestReward = -Infinity;
+                // Update parameters from UI after loading, to ensure consistency
+                this.updateParameters();
+
+                console.log('Actor-Critic (BrainOnly) model loaded successfully.');
+                return true;
             } else {
-                console.warn("No network data found in saved model. Networks remain initialized.");
+                console.error('Invalid modelType for ActorCriticLearning. Expected "ActorCriticLearning_BrainOnly".');
+                this.initializeNetworks(); // Reset to default if incompatible type
+                return false;
             }
-
-            // Restore training state
-            if (modelData.trainingState) {
-                this.trainingHistory = modelData.trainingState.trainingHistory || [];
-                this.trainingEpisode = modelData.trainingState.trainingEpisode || 0;
-            }
-
-            // Restore experience buffer
-            if (modelData.experienceBuffer) {
-                try {
-                    this.experience = JSON.parse(modelData.experienceBuffer);
-                    // Ensure experience array doesn't exceed max size after loading
-                    if (this.experience.length > this.maxExperienceSize) {
-                        this.experience = this.experience.slice(this.experience.length - this.maxExperienceSize);
-                    }
-                } catch (e) {
-                    console.error("Error parsing experience buffer:", e);
-                    this.experience = [];
-                }
-            } else {
-                this.experience = []; // Initialize if not present
-            }
-
-            // It might be good to re-initialize networks if learningRate changed
-            // For now, brain.js networks usually handle learning rate internally or it's passed during train
-            // this.initializeNetworks(); // if parameters like learningRate that affect network structure/init are changed
-
-            console.log('Actor-Critic model loaded successfully.');
-            return true;
         } catch (error) {
             console.error('Error loading Actor-Critic model:', error);
+            this.initializeNetworks(); // Reset to default if loading fails
             return false;
         }
     }

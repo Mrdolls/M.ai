@@ -584,7 +584,7 @@
                                 document.getElementById('geneticTab').addEventListener('click', () => this.switchLearningMethod('genetic'));
                                 document.getElementById('qlearningTab').addEventListener('click', () => this.switchLearningMethod('qlearning'));
                                 document.getElementById('imitationTab').addEventListener('click', () => this.switchLearningMethod('imitation'));
-                                document.getElementById('actorCriticTab').addEventListener('click', () => this.switchLearningMethod('actorCritic'));
+                                document.getElementById('actorCriticTab').addEventListener('click', () => this.switchLearningMethod('actorcritic'));
 
                                 // Control buttons
                                 document.getElementById('startButton').addEventListener('click', () => this.toggleTraining());
@@ -646,7 +646,7 @@
                                 if (geneticParams) geneticParams.style.display = method === 'genetic' ? 'block' : 'none';
                                 if (qlearningParams) qlearningParams.style.display = method === 'qlearning' ? 'block' : 'none';
                                 if (imitationParams) imitationParams.style.display = method === 'imitation' ? 'block' : 'none';
-                                if (actorCriticParams) actorCriticParams.style.display = method === 'actorCritic' ? 'block' : 'none';
+                                if (actorCriticParams) actorCriticParams.style.display = method === 'actorcritic' ? 'block' : 'none';
 
                                 this.updateUI();
                         }
@@ -676,7 +676,7 @@
                                         case 'imitation':
                                                 this.startImitationTraining();
                                                 break;
-                                        case 'actorCritic':
+                                        case 'actorcritic':
                                                 this.startActorCriticTraining();
                                                 break;
                                 }
@@ -813,7 +813,7 @@
                                                                                 document.getElementById('statusMessage').textContent = 'Poids imitation chargés';
                                                                         }
                                                                         break;
-                                                                case 'actorCritic':
+                                                                case 'actorcritic':
                                                                         if (this.actorCriticLearning.loadModel(data)) {
                                                                                 console.log('Weights loaded for Actor-Critic');
                                                                                 document.getElementById('statusMessage').textContent = 'Poids Actor-Critic chargés';
@@ -1070,7 +1070,7 @@
                                                 data = this.imitationLearning.saveModel();
                                                 filename = 'imitation_weights.json';
                                                 break;
-                                        case 'actorCritic':
+                                        case 'actorcritic':
                                                 const actorNetworkData = this.actorCriticLearning.actorNetwork ? this.actorCriticLearning.actorNetwork.toJSON() : null;
                                                 const criticNetworkData = this.actorCriticLearning.criticNetwork ? this.actorCriticLearning.criticNetwork.toJSON() : null;
                                                 data = { modelType: "ActorCriticLearning_BrainOnly", timestamp: Date.now(), networks: { actor: actorNetworkData, critic: criticNetworkData } };
