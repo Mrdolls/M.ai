@@ -547,7 +547,8 @@ class ImitationLearning {
             // Only save the network (the "brain") and its type
             const modelData = {
                 modelType: "ImitationLearning_BrainOnly", // Specific type to indicate simplified format
-                network: this.model.toJSON()
+                network: this.model.toJSON(),
+                brainJsVersion: brain.version // Add Brain.js version
             };
             console.log('ImitationLearning model saved successfully (brain only).');
             return modelData;
@@ -564,37 +565,72 @@ class ImitationLearning {
      */
     loadModel(modelData) {
         try {
+            // Validate modelData (exists and has modelType)
             if (!modelData || !modelData.modelType) {
-                console.error('Invalid or incompatible model data format for ImitationLearning.');
+                console.warn('ImitationLearning: Invalid or missing modelData or modelType. Resetting to default parameters.');
+                this.updateParameters(); // This calls initializeModel()
                 return false;
             }
 
-            // ONLY handle the new "brain only" format
+            // Log Brain.js version from the loaded model, if available
+            if (modelData.brainJsVersion) {
+                console.log('ImitationLearning: Loading model created with Brain.js version:', modelData.brainJsVersion);
+                if (brain.version && modelData.brainJsVersion !== brain.version) {
+                    console.warn('ImitationLearning: Brain.js version mismatch. Loaded model version:', modelData.brainJsVersion, 'Current library version:', brain.version);
+                }
+            }
+
+            // 2. If modelData.modelType is "ImitationLearning_BrainOnly"
             if (modelData.modelType === "ImitationLearning_BrainOnly") {
-                console.log('Loading ImitationLearning model (BrainOnly format)...');
-                this.model = new brain.NeuralNetwork(); // Create new model instance
+                // 2.a. Ensure this.model is a valid brain.NeuralNetwork instance
+                if (!this.model || !(this.model instanceof brain.NeuralNetwork)) {
+                    console.log('ImitationLearning: Initializing new brain.NeuralNetwork instance for loading.');
+                    this.model = new brain.NeuralNetwork();
+                }
+
+                // 2.b. If modelData.network exists
                 if (modelData.network) {
-                    this.model.fromJSON(modelData.network);
-                    console.log('Imitation network loaded from BrainOnly model.');
-                    // Reset training history and current epoch as they are not saved in BrainOnly
+                    this.model.fromJSON(modelData.network); // 2.b.i. Load network
+                    console.log('ImitationLearning: Network loaded successfully from BrainOnly model.');
+
+                    // 2.b.ii. Update learningRate from UI
+                    const lrElement = document.getElementById("imitationLearningRateInput");
+                    if (lrElement) {
+                        const parsedLR = parseFloat(lrElement.value);
+                        this.learningRate = !isNaN(parsedLR) ? parsedLR : this.learningRate;
+                    } else {
+                        // Keep existing this.learningRate if element not found, it might have been set by other means
+                        console.warn("ImitationLearning: Element with ID 'imitationLearningRateInput' not found. Using current learning rate for loaded model.");
+                    }
+                    // Apply the loaded learning rate to the model if the model supports it directly
+                    // Brain.js NeuralNetwork options are typically set at construction or via train()
+                    // We will use this.learningRate in the next call to train()
+
+                    // 2.b.iii. Reset trainingHistory
                     this.trainingHistory = [];
+                    // 2.b.iv. Reset currentEpoch
                     this.currentEpoch = 0;
-                    // Reset learning parameters to defaults or current UI values if applicable
-                    this.updateParameters();
-                    return true;
+
+                    // Note: Other parameters like hiddenLayers are implicitly loaded by fromJSON.
+                    // We do NOT call this.updateParameters() here as that would overwrite the loaded model structure.
+                    console.log('ImitationLearning: Model loaded. Learning rate updated from UI. Training history reset.');
+                    return true; // 2.b.v. Return true
                 } else {
-                    console.warn('No network data found in BrainOnly model. Re-initializing model.');
-                    this.initializeModel(); // Revert to default if no network data
+                    // 2.c. If modelData.network does not exist
+                    console.warn('ImitationLearning: No network data found in BrainOnly model. Resetting to default parameters.');
+                    this.updateParameters(); // This calls initializeModel()
                     return false;
                 }
             } else {
-                console.error('Invalid modelType for ImitationLearning. Expected "ImitationLearning_BrainOnly".');
-                this.initializeModel(); // Reset to default if incompatible type
+                // 3. If modelData.modelType is not the expected one
+                console.error(`ImitationLearning: Invalid modelType. Expected "ImitationLearning_BrainOnly", got "${modelData.modelType}". Resetting to default parameters.`);
+                this.updateParameters(); // This calls initializeModel()
                 return false;
             }
         } catch (error) {
-            console.error("Error loading ImitationLearning model:", error);
-            this.initializeModel(); // Reset to default if loading fails
+            // 4. In any catch block
+            console.error("ImitationLearning: Error loading model:", error);
+            this.updateParameters(); // This calls initializeModel()
             return false;
         }
     }
