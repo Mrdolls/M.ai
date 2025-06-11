@@ -57,7 +57,8 @@
                 }
 
                 #actorCriticTab.active {
-                        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        transform: translateY(-2px); /* This line is added */
                 }
 
                 /* Recording indicator */
@@ -560,7 +561,7 @@
                                 if (geneticParams) geneticParams.style.display = method === 'genetic' ? 'block' : 'none';
                                 if (qlearningParams) qlearningParams.style.display = method === 'qlearning' ? 'block' : 'none';
                                 if (imitationParams) imitationParams.style.display = method === 'imitation' ? 'block' : 'none';
-                                if (actorCriticParams) actorCriticParams.style.display = method === 'actorcritic' ? 'block' : 'none';
+                                if (actorCriticParams) actorCriticParams.style.display = method === 'actorCritic' ? 'block' : 'none';
 
                                 this.updateUI();
                         }
@@ -1070,7 +1071,7 @@
                                 const finalScore = baseScore + convergenceBonus;
 
                                 // Record performance
-                                this.performanceComparator.recordPerformance('actorcritic', {
+                                this.performanceComparator.recordPerformance('actorCritic', {
                                         score: finalScore,
                                         episode: this.currentWave,
                                         epsilon: entropy,
