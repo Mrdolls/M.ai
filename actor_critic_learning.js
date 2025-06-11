@@ -78,50 +78,25 @@ class ActorCriticLearning {
      * Clone a neural network
      */
     cloneNetwork(sourceNetwork) {
-        let sourceJson = null; // Define sourceJson outside try to be available in catch
         try {
             if (!sourceNetwork) {
-                console.error('Source network is null, cannot clone.');
+                console.warn('ActorCriticLearning: Source network is null, cannot clone.');
                 return null;
             }
 
-            sourceJson = sourceNetwork.toJSON(); // Get the full JSON of the source network
+            const sourceJson = sourceNetwork.toJSON();
 
-            // Determine if the source is an actor-like or critic-like network
-            const isActorType = (sourceNetwork === this.actorNetwork || sourceNetwork === this.targetActorNetwork);
-
-            // Prepare construction options, primarily deriving from sourceJson.options
-            // Fallback to root properties of sourceJson if not in sourceJson.options
-            const constructionOptions = {
-                learningRate: this.learningRate, // Use current instance's LR
-                activation: isActorType ? 'sigmoid' : 'relu',
-                hiddenLayers: sourceJson.options && sourceJson.options.hiddenLayers ? sourceJson.options.hiddenLayers : sourceJson.hiddenLayers,
-                inputSize: sourceJson.options && sourceJson.options.inputSize ? sourceJson.options.inputSize : sourceJson.inputSize,
-                outputSize: sourceJson.options && sourceJson.options.outputSize ? sourceJson.options.outputSize : sourceJson.outputSize
-            };
-
-            if (isActorType) {
-                constructionOptions.outputActivation = 'softmax';
-            }
-
-            // Log if crucial options are missing, as brain.js constructor might fail or create a differently structured network
-            if (!constructionOptions.hiddenLayers || !constructionOptions.inputSize || !constructionOptions.outputSize) {
-                console.warn('Cloning network: One or more structural parameters (hiddenLayers, inputSize, outputSize) are undefined. Constructor might rely on defaults or fromJSON to set them.', constructionOptions, sourceJson);
-            }
-
-            // Create a new network.
-            // Pass only the necessary structural and activation options to the constructor.
-            // fromJSON will handle the rest (weights, biases, and potentially overriding some options if they are part of the JSON structure it expects).
-            const newNetwork = new brain.NeuralNetwork(constructionOptions);
-
-            // Apply the full state from the source network's JSON
-            // This will set weights, biases, and potentially other specific options stored in the JSON.
+            // Create a new default NeuralNetwork instance.
+            // brain.js@2.0.0-beta.24's fromJSON is expected to reconstruct the network fully,
+            // including its architecture (layers, activation, etc.) from the JSON.
+            const newNetwork = new brain.NeuralNetwork();
             newNetwork.fromJSON(sourceJson);
 
             return newNetwork;
         } catch (error) {
-            // Log the error and the JSON that might have caused it for easier debugging
-            console.error('Error cloning network:', error, sourceJson || 'sourceNetwork is null or sourceJson could not be generated');
+            console.error('ActorCriticLearning: Error cloning network:', error);
+            // It might be useful to log sourceJson here if it's available and error is specific to fromJSON
+            // console.error('Source JSON that may have caused error:', sourceJson); // Uncomment for debugging
             return null;
         }
     }
@@ -581,7 +556,8 @@ class ActorCriticLearning {
                     actor: this.actorNetwork ? this.actorNetwork.toJSON() : null,
                     critic: this.criticNetwork ? this.criticNetwork.toJSON() : null,
                     // Target networks are auxiliary for training and not part of the deployed "brain"
-                }
+                },
+                brainJsVersion: brain.version // Add Brain.js version
             };
             console.log('Actor-Critic model saved successfully (brain only).');
             return modelData;
@@ -599,8 +575,17 @@ class ActorCriticLearning {
     loadModel(modelData) {
         try {
             if (!modelData || !modelData.modelType) {
-                console.error('Invalid or incompatible model data format for ActorCriticLearning.');
+                console.error('ActorCriticLearning: Invalid or incompatible model data format. Resetting to default parameters.');
+                this.initializeNetworks(); // Reset to default
                 return false;
+            }
+
+            // Log Brain.js version from the loaded model, if available
+            if (modelData.brainJsVersion) {
+                console.log('ActorCriticLearning: Loading model created with Brain.js version:', modelData.brainJsVersion);
+                if (brain.version && modelData.brainJsVersion !== brain.version) {
+                    console.warn('ActorCriticLearning: Brain.js version mismatch. Loaded model version:', modelData.brainJsVersion, 'Current library version:', brain.version);
+                }
             }
 
             // ONLY handle the new "BrainOnly" model type
@@ -661,18 +646,94 @@ class ActorCriticLearning {
                 this.epsilon = 1.0; // Epsilon should typically be reset on load for a new training session
                 this.avgReward = 0;
                 this.bestReward = -Infinity;
-                // Update parameters from UI after loading, to ensure consistency
-                this.updateParameters();
 
-                console.log('Actor-Critic (BrainOnly) model loaded successfully.');
+                // Manually update training parameters from UI elements
+                // Learning Rate
+                const lrElement = document.getElementById('actorCriticLearningRateInput');
+                if (lrElement) {
+                    const parsedLR = parseFloat(lrElement.value);
+                    this.learningRate = !isNaN(parsedLR) ? parsedLR : this.learningRate;
+                } else {
+                    console.warn("ActorCriticLearning: Element 'actorCriticLearningRateInput' not found. Using current learning rate.");
+                }
+
+                // Batch Size
+                const batchSizeElement = document.getElementById('actorCriticBatchSizeInput');
+                if (batchSizeElement) {
+                    const parsedBS = parseInt(batchSizeElement.value);
+                    this.batchSize = !isNaN(parsedBS) ? parsedBS : this.batchSize;
+                } else {
+                    console.warn("ActorCriticLearning: Element 'actorCriticBatchSizeInput' not found. Using current batch size.");
+                }
+
+                // Gamma (Discount Factor)
+                const gammaElement = document.getElementById('actorCriticDiscountFactorInput');
+                if (gammaElement) {
+                    const parsedGamma = parseFloat(gammaElement.value);
+                    this.gamma = !isNaN(parsedGamma) ? parsedGamma : this.gamma;
+                } else {
+                    console.warn("ActorCriticLearning: Element 'actorCriticDiscountFactorInput' not found. Using current gamma.");
+                }
+
+                // Tau (Soft Update Parameter)
+                const tauElement = document.getElementById('softUpdateInput'); // Assuming this is the correct ID for AC tau
+                if (tauElement) {
+                    const parsedTau = parseFloat(tauElement.value);
+                    this.tau = !isNaN(parsedTau) ? parsedTau : this.tau;
+                } else {
+                    console.warn("ActorCriticLearning: Element 'softUpdateInput' not found. Using current tau.");
+                }
+
+                // Epsilon (Exploration Rate) - Note: Epsilon is reset to 1.0 above, UI might provide initial override if needed for some reason.
+                // For now, we rely on the reset to 1.0 and subsequent decay during training.
+                // If UI should set initial epsilon after load, add here:
+                const epsilonElement = document.getElementById('actorCriticEpsilonInput'); // Assuming an ID like this
+                if (epsilonElement) {
+                    const parsedEpsilon = parseFloat(epsilonElement.value);
+                    // This overrides the reset to 1.0 if a UI element is present and valid
+                    this.epsilon = !isNaN(parsedEpsilon) ? parsedEpsilon : this.epsilon;
+                } else {
+                     // console.warn("ActorCriticLearning: Element for initial epsilon not found. Using default reset value.");
+                }
+
+
+                // Epsilon Decay
+                const epsilonDecayElement = document.getElementById('actorCriticEpsilonDecayInput'); // Assuming an ID
+                if (epsilonDecayElement) {
+                    const parsedED = parseFloat(epsilonDecayElement.value);
+                    this.epsilonDecay = !isNaN(parsedED) ? parsedED : this.epsilonDecay;
+                } else {
+                    console.warn("ActorCriticLearning: Element 'actorCriticEpsilonDecayInput' not found. Using current epsilon decay.");
+                }
+
+                // Epsilon Min
+                const epsilonMinElement = document.getElementById('actorCriticEpsilonMinInput'); // Assuming an ID
+                if (epsilonMinElement) {
+                    const parsedEM = parseFloat(epsilonMinElement.value);
+                    this.epsilonMin = !isNaN(parsedEM) ? parsedEM : this.epsilonMin;
+                } else {
+                    console.warn("ActorCriticLearning: Element 'actorCriticEpsilonMinInput' not found. Using current epsilon min.");
+                }
+
+                // Entropy Coefficient
+                const entropyCoeffElement = document.getElementById('entropyCoeffInput'); // Assuming this is the correct ID for AC entropy
+                if (entropyCoeffElement) {
+                    const parsedEntropy = parseFloat(entropyCoeffElement.value);
+                    this.entropyCoefficient = !isNaN(parsedEntropy) ? parsedEntropy : this.entropyCoefficient;
+                } else {
+                    console.warn("ActorCriticLearning: Element 'entropyCoeffInput' not found. Using current entropy coefficient.");
+                }
+                // DO NOT call this.updateParameters() or this.initializeNetworks() here as it would overwrite loaded networks.
+
+                console.log('Actor-Critic (BrainOnly) model loaded successfully. Training parameters updated from UI.');
                 return true;
             } else {
-                console.error('Invalid modelType for ActorCriticLearning. Expected "ActorCriticLearning_BrainOnly".');
+                console.error('ActorCriticLearning: Invalid modelType. Expected "ActorCriticLearning_BrainOnly". Initializing default networks.');
                 this.initializeNetworks(); // Reset to default if incompatible type
                 return false;
             }
         } catch (error) {
-            console.error('Error loading Actor-Critic model:', error);
+            console.error('ActorCriticLearning: Error loading model:', error);
             this.initializeNetworks(); // Reset to default if loading fails
             return false;
         }

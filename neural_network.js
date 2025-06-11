@@ -390,7 +390,8 @@ class NeuralNetworkManager {
         try {
             return {
                 modelType: metadata.type || 'brain.js_network', // Indicate the type of network (e.g., genetic, qlearning)
-                network: network.toJSON() // Only save the neural network's internal state
+                network: network.toJSON(), // Only save the neural network's internal state
+                brainJsVersion: brain.version // Add Brain.js version
             };
         } catch (error) {
             console.error('Error saving network:', error);
@@ -405,11 +406,20 @@ class NeuralNetworkManager {
         if (!data || !data.network) return null;
 
         try {
+            if (data.brainJsVersion) {
+                console.log('Loading model created with Brain.js version:', data.brainJsVersion);
+                if (brain.version && data.brainJsVersion !== brain.version) {
+                    console.warn('Brain.js version mismatch. Loaded model version:', data.brainJsVersion, 'Current library version:', brain.version);
+                }
+            }
+
             const network = this.createNetwork();
             network.fromJSON(data.network);
             return {
                 network: network,
-                metadata: data.metadata || {} // Keep metadata for compatibility, though not used in save now
+                // Keep metadata for compatibility, though not used in save now.
+                // Include brainJsVersion in returned metadata if it was present in the loaded data.
+                metadata: { ...(data.metadata || {}), brainJsVersion: data.brainJsVersion }
             };
         } catch (error) {
             console.error('Error loading network:', error);
