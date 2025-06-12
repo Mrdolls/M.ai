@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q-Learning Grid World</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Q-Learning Agent Playground</h1>
+
+        <div class="controls-main">
+            <button id="startPauseButton">Start</button>
+            <button id="resetButton">Reset</button>
+        </div>
+
+        <div class="main-content">
+            <div class="canvas-container">
+                <canvas id="gridCanvas"></canvas>
+            </div>
+
+            <div class="info-panel">
+                <h2>Info</h2>
+                <p>Episode: <span id="episodeDisplay">-</span></p>
+                <p>Steps: <span id="stepsDisplay">-</span></p>
+                <p>Total Reward: <span id="rewardDisplay">-</span></p>
+                <p>Epsilon: <span id="epsilonDisplay">-</span></p>
+                <p>Status: <span id="statusDisplay">Idle</span></p>
+            </div>
+        </div>
+
+        <div class="parameters">
+            <h2>Parameters</h2>
+            <div class="param-group">
+                <label for="gridSize">Grid Size (N x N):</label>
+                <input type="number" id="gridSize" value="10" min="5" max="50">
+            </div>
+            <div class="param-group">
+                <label for="trainingSpeed">Training Speed (ms delay):</label>
+                <input type="number" id="trainingSpeed" value="100" min="0" max="1000" step="10">
+            </div>
+            <div class="param-group">
+                <label for="numPoints">Number of Points:</label>
+                <input type="number" id="numPoints" value="5" min="1" max="20">
+            </div>
+            <div class="param-group">
+                <label for="maxSteps">Max Steps per Episode:</label>
+                <input type="number" id="maxSteps" value="200" min="10" max="1000">
+            </div>
+            <div class="param-group">
+                <label for="numEpisodes">Number of Episodes:</label>
+                <input type="number" id="numEpisodes" value="1000" min="10" max="100000">
+            </div>
+            <div class="param-group">
+                <label for="alpha">Learning Rate (Alpha α):</label>
+                <input type="number" id="alpha" value="0.1" min="0.01" max="1" step="0.01">
+            </div>
+            <div class="param-group">
+                <label for="gamma">Discount Factor (Gamma γ):</label>
+                <input type="number" id="gamma" value="0.9" min="0.01" max="1" step="0.01">
+            </div>
+            <div class="param-group">
+                <label for="epsilonStart">Initial Epsilon (ε):</label>
+                <input type="number" id="epsilonStart" value="1.0" min="0.01" max="1" step="0.01">
+            </div>
+             <div class="param-group">
+                <label for="epsilonDecay">Epsilon Decay Rate:</label>
+                <input type="number" id="epsilonDecay" value="0.995" min="0.8" max="1" step="0.001">
+            </div>
+        </div>
+
+        <div class="manual-control">
+            <h2>Manual Control</h2>
+            <p>Use arrow keys to move the agent. (Focus the canvas first if needed)</p>
+            <div class="manual-buttons">
+                <button id="manualUp">Up</button>
+                <div>
+                    <button id="manualLeft">Left</button>
+                    <button id="manualStay">Stay</button>
+                    <button id="manualRight">Right</button>
+                </div>
+                <button id="manualDown">Down</button>
+            </div>
+        </div>
+
+        <div class="q-table-management">
+            <h2>Q-Table Management</h2>
+            <button id="saveQTableButton">Save Q-Table</button>
+            <button id="loadQTableButton">Load Q-Table</button>
+            <button id="clearQTableButton">Clear Q-Table</button>
+        </div>
+
+        <div class="q-table-heatmap">
+            <h2>Q-Table Heatmap (Coming Soon)</h2>
+            <canvas id="heatmapCanvas"></canvas>
+        </div>
+
+    </div>
+    <script src="agent.js"></script>
+    <script src="environment.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
