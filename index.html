@@ -1,104 +1,1759 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Q-Learning Grid World</title>
-    <link rel="stylesheet" href="style.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Entraînement IA Actor-Critic (Génétique)</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<style>
+		/* Importation de la police Inter pour un look moderne et lisible */
+		@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+		/* Définition des variables CSS pour une gestion facile du thème */
+		:root {
+			--primary-color-start: #6a11cb;
+			/* Violet */
+			--primary-color-end: #2575fc;
+			/* Bleu */
+			--primary-gradient: linear-gradient(45deg, var(--primary-color-start) 0%, var(--primary-color-end) 100%);
+			/* Dégradé Violet-Bleu */
+			--secondary-gradient: linear-gradient(45deg, var(--primary-color-end) 0%, var(--primary-color-start) 100%);
+			/* Dégradé Bleu-Violet pour le survol */
+			--dark-bg: #121212;
+			/* Arrière-plan très sombre */
+			--container-bg: #1e1e1e;
+			/* Arrière-plan du conteneur principal */
+			--section-bg: #2a2a2a;
+			/* Arrière-plan des sections individuelles */
+			--text-light: #e0e0e0;
+			/* Couleur de texte principale claire */
+			--text-muted: #b0b0b0;
+			/* Couleur de texte secondaire/labels */
+			--accent-color-green: #00e676;
+			/* Vert vif pour les valeurs positives */
+			--accent-color-yellow: #ffeb3b;
+			/* Jaune pour les meilleurs scores */
+			--border-color: #3a3a3a;
+			/* Couleur des bordures subtiles */
+			--shadow-dark: rgba(0, 0, 0, 0.7);
+			/* Ombre prononcée pour la profondeur */
+			--shadow-light: rgba(0, 0, 0, 0.4);
+			/* Ombre plus légère pour les détails */
+		}
+
+		body {
+			background: var(--dark-bg);
+			color: var(--text-light);
+			font-family: 'Inter', sans-serif;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			justify-content: center;
+			align-items: flex-start;
+			min-height: 100vh;
+			box-sizing: border-box;
+			line-height: 1.6;
+			position: relative;
+			overflow-x: hidden;
+		}
+
+		.container {
+			background-color: var(--container-bg);
+			border-radius: 18px;
+			box-shadow: 0 10px 30px var(--shadow-dark);
+			padding: 35px;
+			width: 100%;
+			max-width: 1200px;
+			margin: 0 20px;
+			display: flex;
+			flex-direction: column;
+			gap: 30px;
+			border: 1px solid var(--border-color);
+			box-sizing: border-box;
+		}
+
+		h1,
+		h2 {
+			color: var(--text-light);
+			text-align: center;
+			margin-bottom: 0;
+			font-weight: 700;
+			letter-spacing: 0.5px;
+			background: var(--primary-gradient);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		.section-panel {
+			background-color: var(--section-bg);
+			border-radius: 12px;
+			box-shadow: inset 0 3px 8px var(--shadow-light);
+			padding: 20px;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 20px;
+			align-items: center;
+			justify-content: center;
+			border: 1px solid var(--border-color);
+			box-sizing: border-box;
+		}
+
+		button {
+			background: var(--primary-gradient);
+			background-size: 200% auto;
+			color: white;
+			border: none;
+			padding: 12px 25px;
+			border-radius: 10px;
+			cursor: pointer;
+			font-size: 17px;
+			font-weight: 600;
+			transition: all 0.4s ease;
+			box-shadow: 0 5px 15px var(--shadow-dark);
+			position: relative;
+			overflow: hidden;
+			letter-spacing: 0.5px;
+		}
+
+		button:hover:not(:disabled) {
+			background-position: right center;
+			transform: translateY(-3px) scale(1.02);
+			box-shadow: 0 8px 20px rgba(0, 0, 0, 0.9);
+		}
+
+		button:active:not(:disabled) {
+			transform: translateY(-1px) scale(0.99);
+			box-shadow: 0 3px 10px var(--shadow-dark);
+		}
+
+		button:disabled {
+			background: #4a4a4a;
+			cursor: not-allowed;
+			box-shadow: none;
+			opacity: 0.6;
+			transform: none;
+		}
+
+		label {
+			color: var(--text-muted);
+			font-size: 16px;
+			white-space: nowrap;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			font-weight: 500;
+		}
+
+		input[type="number"] {
+			background-color: #333333;
+			color: var(--text-light);
+			border: 1px solid var(--border-color);
+			padding: 10px 12px;
+			border-radius: 8px;
+			width: 100px;
+			font-size: 16px;
+			text-align: center;
+			transition: border-color 0.3s ease, box-shadow 0.3s ease;
+			-moz-appearance: textfield;
+		}
+
+		input[type="number"]::-webkit-outer-spin-button,
+		input[type="number"]::-webkit-inner-spin-button {
+			-webkit-appearance: none;
+			margin: 0;
+		}
+
+		input[type="number"]:focus {
+			outline: none;
+			border-color: var(--primary-color-end);
+			box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.5);
+		}
+
+		.training-stats-panel {
+			flex-direction: column;
+			gap: 15px;
+			width: 100%;
+			max-width: 350px;
+			margin: 0 auto;
+		}
+
+		.training-stats-panel h2 {
+			margin-top: 0;
+			margin-bottom: 15px;
+			text-align: center;
+			background: var(--primary-gradient);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		.training-stats-panel p {
+			margin: 10px 0;
+			font-size: 16px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			width: 100%;
+		}
+
+		.training-stats-panel span {
+			font-weight: 600;
+			color: var(--accent-color-green);
+		}
+
+		.training-stats-panel .best-score-label {
+			color: var(--accent-color-yellow);
+			font-weight: bold;
+		}
+
+		/* Nouveau style pour le groupe de boutons de sauvegarde */
+		.training-stats-panel .save-load-buttons {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: 10px;
+			margin-top: 15px;
+			padding-top: 15px;
+			border-top: 1px solid var(--border-color);
+		}
+
+		.game-area-wrapper {
+			display: flex;
+			flex-direction: column;
+			gap: 30px;
+			justify-content: center;
+			align-items: center;
+			padding: 25px;
+			background-color: var(--section-bg);
+			border-radius: 12px;
+			box-shadow: inset 0 3px 8px var(--shadow-light);
+			border: 1px solid var(--border-color);
+			flex-grow: 1;
+		}
+
+		#gameCanvas {
+			width: 100%;
+			max-width: 700px;
+			height: auto;
+			aspect-ratio: 3 / 2;
+			background-color: #111111;
+			border-radius: 10px;
+			box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+			border: 1px solid var(--border-color);
+			box-sizing: border-box;
+		}
+
+		.test-sidebar {
+			flex-direction: column;
+			gap: 20px;
+			width: 100%;
+			max-width: 350px;
+		}
+
+		.test-sidebar h2 {
+			margin-top: 0;
+			margin-bottom: 5px;
+			text-align: center;
+			background: var(--primary-gradient);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		.test-sidebar .button-group {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 15px;
+			justify-content: center;
+			width: 100%;
+			margin-top: 10px;
+			margin-bottom: 10px;
+		}
+
+		.test-sidebar .test-stats-display-area p {
+			margin: 10px 0;
+			font-size: 16px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.test-sidebar .test-stats-display-area span {
+			font-weight: 600;
+			color: var(--accent-color-green);
+		}
+
+		.settings-panel {
+			position: fixed;
+			top: 0;
+			right: -350px;
+			width: 320px;
+			height: 100%;
+			background-color: var(--container-bg);
+			box-shadow: -5px 0 15px var(--shadow-dark);
+			transition: right 0.3s ease-in-out;
+			z-index: 1000;
+			padding: 20px;
+			box-sizing: border-box;
+			display: flex;
+			flex-direction: column;
+			gap: 15px;
+			overflow-y: auto;
+			border-left: 1px solid var(--border-color);
+		}
+
+		.settings-panel.open {
+			right: 0;
+		}
+
+		.settings-panel h2 {
+			text-align: left;
+			margin-bottom: 15px;
+			background: var(--primary-gradient);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		.settings-panel label {
+			width: 100%;
+			justify-content: space-between;
+		}
+
+		.settings-panel input[type="number"] {
+			width: 80px;
+		}
+
+		.settings-toggle-button {
+			background: var(--primary-gradient);
+			color: white;
+			border: none;
+			padding: 12px 15px;
+			border-radius: 10px;
+			cursor: pointer;
+			font-size: 17px;
+			font-weight: 600;
+			transition: all 0.4s ease;
+			box-shadow: 0 5px 15px var(--shadow-dark);
+			position: relative;
+			overflow: hidden;
+			letter-spacing: 0.5px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.settings-toggle-button:hover {
+			transform: translateY(-3px) scale(1.02);
+			box-shadow: 0 8px 20px rgba(0, 0, 0, 0.9);
+		}
+
+		.settings-toggle-button:active {
+			transform: translateY(-1px) scale(0.99);
+			box-shadow: 0 3px 10px var(--shadow-dark);
+		}
+
+		@media (max-width: 767px) {
+			.container {
+				margin: 0 10px;
+				padding: 20px;
+			}
+		}
+
+		@media (min-width: 768px) {
+
+			.game-area-wrapper {
+				flex-direction: row;
+				justify-content: center;
+				align-items: center;
+				gap: 30px;
+			}
+
+			#gameCanvas {
+				flex-basis: 60%;
+				min-width: 400px;
+			}
+
+			.test-sidebar {
+				flex-basis: 30%;
+				min-width: 300px;
+			}
+
+			.training-stats-panel {
+				width: auto;
+				max-width: 400px;
+			}
+		}
+
+		@media (min-width: 1024px) {
+			.container {
+				padding: 40px;
+			}
+
+			.controls {
+				order: 1;
+				width: 100%;
+			}
+
+			.training-stats-panel {
+				order: 2;
+				width: 100%;
+				max-width: 450px;
+			}
+
+			.game-area-wrapper {
+				order: 3;
+				width: 100%;
+				flex-direction: row;
+				justify-content: center;
+				gap: 50px;
+				align-items: center;
+			}
+
+			#gameCanvas {
+				width: auto;
+				height: auto;
+				max-width: 600px;
+				max-height: 400px;
+			}
+
+			.test-sidebar {
+				flex-basis: 350px;
+				max-width: 350px;
+				gap: 25px;
+			}
+
+			.test-sidebar h2 {
+				margin-top: 0;
+				margin-bottom: 10px;
+			}
+
+			.test-sidebar .button-group {
+				margin-top: 15px;
+				margin-bottom: 15px;
+			}
+		}
+	</style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Q-Learning Agent Playground</h1>
+	<div class="container">
+		<h1>Entraînement IA Actor-Critic (Génétique) : Carré Ramasseur de Ronds</h1>
 
-        <div class="controls-main">
-            <button id="startPauseButton">Start</button>
-            <button id="resetButton">Reset</button>
-        </div>
+		<div class="section-panel controls">
+			<button id="settingsButton" class="settings-toggle-button">
+				<i class="fas fa-cog"></i>
+			</button>
+			<button id="startButton">Démarrer l'entraînement Génétique</button>
+			<button id="stopButton" disabled>Arrêter l'entraînement</button>
+		</div>
 
-        <div class="main-content">
-            <div class="canvas-container">
-                <canvas id="gridCanvas"></canvas>
-            </div>
+		<div class="section-panel training-stats-panel">
+			<h2>Statistiques d'entraînement</h2>
+			<p>Génération actuelle : <span id="currentGeneration">0</span></p>
+			<p><span class="best-score-label">Meilleur Score Global :</span> <span id="bestRewardAllTime">0</span></p>
+			<p>Ronds collectés (meilleur score) : <span id="bestCirclesAllTimeSpan">0</span></p>
 
-            <div class="info-panel">
-                <h2>Info</h2>
-                <p>Episode: <span id="episodeDisplay">-</span></p>
-                <p>Steps: <span id="stepsDisplay">-</span></p>
-                <p>Total Reward: <span id="rewardDisplay">-</span></p>
-                <p>Epsilon: <span id="epsilonDisplay">-</span></p>
-                <p>Status: <span id="statusDisplay">Idle</span></p>
-            </div>
-        </div>
+			<div class="save-load-buttons">
+				<button id="saveButton">Save</button>
+				<input type="file" id="loadFileInput" accept=".json" style="display: none;">
+				<button id="loadButton">Load</button>
+				<button id="resetButton">Reset</button>
+				<button id="clearCacheButton">Clear Cache</button>
+			</div>
+		</div>
 
-        <div class="parameters">
-            <h2>Parameters</h2>
-            <div class="param-group">
-                <label for="gridSize">Grid Size (N x N):</label>
-                <input type="number" id="gridSize" value="10" min="5" max="50">
-            </div>
-            <div class="param-group">
-                <label for="trainingSpeed">Training Speed (ms delay):</label>
-                <input type="number" id="trainingSpeed" value="100" min="0" max="1000" step="10">
-            </div>
-            <div class="param-group">
-                <label for="numPoints">Number of Points:</label>
-                <input type="number" id="numPoints" value="5" min="1" max="20">
-            </div>
-            <div class="param-group">
-                <label for="maxSteps">Max Steps per Episode:</label>
-                <input type="number" id="maxSteps" value="200" min="10" max="1000">
-            </div>
-            <div class="param-group">
-                <label for="numEpisodes">Number of Episodes:</label>
-                <input type="number" id="numEpisodes" value="1000" min="10" max="100000">
-            </div>
-            <div class="param-group">
-                <label for="alpha">Learning Rate (Alpha α):</label>
-                <input type="number" id="alpha" value="0.1" min="0.01" max="1" step="0.01">
-            </div>
-            <div class="param-group">
-                <label for="gamma">Discount Factor (Gamma γ):</label>
-                <input type="number" id="gamma" value="0.9" min="0.01" max="1" step="0.01">
-            </div>
-            <div class="param-group">
-                <label for="epsilonStart">Initial Epsilon (ε):</label>
-                <input type="number" id="epsilonStart" value="1.0" min="0.01" max="1" step="0.01">
-            </div>
-             <div class="param-group">
-                <label for="epsilonDecay">Epsilon Decay Rate:</label>
-                <input type="number" id="epsilonDecay" value="0.995" min="0.8" max="1" step="0.001">
-            </div>
-        </div>
+		<div class="section-panel game-area-wrapper">
+			<div class="section-panel test-sidebar">
+				<h2>Contrôles et Statistiques du Test Visuel</h2>
+				<div class="button-group">
+					<button id="testBestIAButton" disabled>Démarrer le Test Visuel</button>
+					<button id="stopTestButtonVisual" disabled>Arrêter le Test Visuel</button>
+				</div>
 
-        <div class="manual-control">
-            <h2>Manual Control</h2>
-            <p>Use arrow keys to move the agent. (Focus the canvas first if needed)</p>
-            <div class="manual-buttons">
-                <button id="manualUp">Up</button>
-                <div>
-                    <button id="manualLeft">Left</button>
-                    <button id="manualStay">Stay</button>
-                    <button id="manualRight">Right</button>
-                </div>
-                <button id="manualDown">Down</button>
-            </div>
-        </div>
+				<div class="test-stats-display-area">
+					<p>Score actuel du test : <span id="currentTestScore">0</span></p>
+					<p>Ronds ramassés (test) : <span id="circlesCollectedTest">0</span></p>
+				</div>
+			</div>
 
-        <div class="q-table-management">
-            <h2>Q-Table Management</h2>
-            <button id="saveQTableButton">Save Q-Table</button>
-            <button id="loadQTableButton">Load Q-Table</button>
-            <button id="clearQTableButton">Clear Q-Table</button>
-        </div>
+			<canvas id="gameCanvas" width="600" height="400"></canvas>
+		</div>
 
-        <div class="q-table-heatmap">
-            <h2>Q-Table Heatmap (Coming Soon)</h2>
-            <canvas id="heatmapCanvas"></canvas>
-        </div>
+	</div>
 
-    </div>
-    <script src="agent.js"></script>
-    <script src="environment.js"></script>
-    <script src="script.js"></script>
+	<div id="settingsPanel" class="settings-panel">
+		<h2>Paramètres d'entraînement</h2>
+		<label for="numIndividuals">Individus :</label>
+		<input type="number" id="numIndividuals" value="10" step="1" min="2">
+
+		<label for="numGenerations">Générations :</label>
+		<input type="number" id="numGenerations" value="100" step="10" min="1">
+
+		<label for="episodesPerIndividual">Épisodes/Individu :</label>
+		<input type="number" id="episodesPerIndividual" value="50" step="10" min="1">
+
+		<label for="mutationRate">Taux Mutation :</label>
+		<input type="number" id="mutationRate" value="0.05" step="0.01" min="0" max="1">
+
+		<label for="learningRateActor">Acteur :</label>
+		<input type="number" id="learningRateActor" value="0.001" step="0.0001">
+
+		<label for="learningRateCritic">Critique :</label>
+		<input type="number" id="learningRateCritic" value="0.005" step="0.0001">
+
+		<label for="gamma">Gamma :</label>
+		<input type="number" id="gamma" value="0.99" step="0.01">
+
+		<label for="numElitism">Nb Élitisme :</label>
+		<input type="number" id="numElitism" value="1" step="1" min="0">
+
+		<hr>
+		<h3>Paramètres de Récompense/Pénalité</h3>
+		<label for="collectionDistanceThreshold">Seuil Coll. Distance :</label>
+		<input type="number" id="collectionDistanceThreshold" value="10" step="1" min="0">
+
+		<label for="stagnationPenalty">Pénalité Stagnation :</label>
+		<input type="number" id="stagnationPenalty" value="-0.2" step="0.05">
+
+		<label for="stagnationThresholdSteps">Seuil Stagnation (pas) :</label>
+		<input type="number" id="stagnationThresholdSteps" value="30" step="5" min="1">
+
+		<label for="actionChangePenalty">Pénalité Chgmt Action :</label>
+		<input type="number" id="actionChangePenalty" value="-0.02" step="0.01">
+	</div>
+
+	<script type="module">
+		// --- Références DOM ---
+		const canvas = document.getElementById('gameCanvas');
+		const ctx = canvas.getContext('2d');
+
+		const startButton = document.getElementById('startButton');
+		const stopButton = document.getElementById('stopButton');
+		const numIndividualsInput = document.getElementById('numIndividuals');
+		const numGenerationsInput = document.getElementById('numGenerations');
+		const episodesPerIndividualInput = document.getElementById('episodesPerIndividual');
+		const mutationRateInput = document.getElementById('mutationRate');
+		const learningRateActorInput = document.getElementById('learningRateActor');
+		const learningRateCriticInput = document.getElementById('learningRateCritic');
+		const gammaInput = document.getElementById('gamma');
+		const numElitismInput = document.getElementById('numElitism');
+
+		// Nouvelles références DOM pour les paramètres de récompense/pénalité
+		const collectionDistanceThresholdInput = document.getElementById('collectionDistanceThreshold');
+		const stagnationPenaltyInput = document.getElementById('stagnationPenalty');
+		const stagnationThresholdStepsInput = document.getElementById('stagnationThresholdSteps');
+		const actionChangePenaltyInput = document.getElementById('actionChangePenalty');
+
+		const currentGenerationSpan = document.getElementById('currentGeneration');
+		const bestRewardAllTimeSpan = document.getElementById('bestRewardAllTime');
+		const bestCirclesAllTimeSpan = document.getElementById('bestCirclesAllTimeSpan');
+
+		const testBestIAButton = document.getElementById('testBestIAButton');
+		const stopTestButtonVisual = document.getElementById('stopTestButtonVisual');
+		const currentTestScoreSpan = document.getElementById('currentTestScore');
+		const circlesCollectedTestSpan = document.getElementById('circlesCollectedTest');
+
+		// Références pour le panneau de paramètres
+		const settingsPanel = document.getElementById('settingsPanel');
+		const settingsButton = document.getElementById('settingsButton');
+
+		// Références pour les nouveaux boutons de sauvegarde/chargement
+		const saveButton = document.getElementById('saveButton');
+		const loadButton = document.getElementById('loadButton');
+		const loadFileInput = document.getElementById('loadFileInput'); // Input de fichier caché
+		const resetButton = document.getElementById('resetButton');
+		const clearCacheButton = document.getElementById('clearCacheButton');
+
+
+		// --- Paramètres du Jeu (pour l'environnement d'évaluation) ---
+		const SQUARE_SIZE = 30;
+		let squareX = canvas.width / 2 - SQUARE_SIZE / 2;
+		let squareY = canvas.height / 2 - SQUARE_SIZE / 2;
+		const SQUARE_SPEED = 5;
+
+		const CIRCLE_RADIUS = 10;
+		const MAX_CIRCLES = 5;
+		let circles = [];
+
+		// Statistiques globales de la session (non réinitialisées à chaque génération)
+		let bestRewardAllTime = 0;
+		let bestCirclesAllTime = 0;
+
+		let isTraining = false;
+		let isTestingVisual = false;
+		let animationFrameId = null;
+		let currentGeneration = 0; // Global variable to keep track of the actual generation count
+
+		// Stocke les poids du meilleur agent pour le test
+		let bestActorWeights = null;
+		let bestCriticWeights = null;
+		let bestAgentInstance = null;
+
+		// --- Paramètres de Récompense / Pénalité ---
+		// Valeurs par défaut, seront mises à jour depuis l'UI
+		let REWARD_COLLECT_CIRCLE = 10;
+		let PENALTY_PER_STEP = -0.01;
+
+		let BONUS_QUICK_COLLECTION_BASE = 5;
+		let BONUS_QUICK_COLLECTION_DECAY = 0.02;
+
+		let BONUS_PROXIMITY = 0.05;
+		let PROXIMITY_THRESHOLD = 150;
+
+		let BONUS_ACTION_VARIATION_PER_STEP = 0.005;
+		let ACTION_HISTORY_BUFFER_SIZE = 10;
+		let MIN_UNIQUE_ACTIONS_FOR_BONUS = 3;
+
+		let BONUS_NO_WALL_HIT_EPISODE = 1;
+
+		let PENALTY_WALL_HIT_PER_STEP = -0.5;
+		let PENALTY_INACTIVITY = -0.1;
+		let INACTIVITY_THRESHOLD_STEPS = 50;
+
+		let PENALTY_REPETITIVE_ACTION = -0.05;
+		let REPETITIVE_ACTION_THRESHOLD_STEPS = 10;
+
+		let PENALTY_EARLY_EMPTY_EPISODE = -5;
+		let EARLY_END_TIME_THRESHOLD = 100;
+
+		let COLLECTION_DISTANCE_THRESHOLD = 10;
+		let PENALTY_STAGNATION = -0.2;
+		let STAGNATION_THRESHOLD_STEPS = 30;
+		let PENALTY_ACTION_CHANGE = -0.02;
+
+
+		// Variables d'état pour le calcul de récompense par épisode
+		let lastSquareX;
+		let lastSquareY;
+		let inactivitySteps;
+		let lastActionIndex = -1;
+		let repetitiveActionSteps;
+		let episodeWallHit;
+		let actionHistoryBuffer = [];
+		let previousDistanceToClosestCircle;
+		let stagnationTrackingSteps = 0;
+
+
+		// --- IndexedDB Setup ---
+		const DB_NAME = 'ActorCriticTrainingDB';
+		const STORE_NAME = 'agentWeights';
+		const DB_VERSION = 1;
+		let db;
+
+		/**
+		 * Ouvre ou crée la base de données IndexedDB.
+		 * @returns {Promise<IDBDatabase>} La base de données IndexedDB.
+		 */
+		function openDatabase() {
+			return new Promise((resolve, reject) => {
+				const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+				request.onupgradeneeded = (event) => {
+					db = event.target.result;
+					if (!db.objectStoreNames.contains(STORE_NAME)) {
+						db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+					}
+				};
+
+				request.onsuccess = (event) => {
+					db = event.target.result;
+					log("IndexedDB opened successfully.");
+					resolve(db);
+				};
+
+				request.onerror = (event) => {
+					console.error("IndexedDB error:", event.target.errorCode);
+					reject(event.target.errorCode);
+				};
+			});
+		}
+
+		/**
+		 * Sauvegarde les poids de l'acteur et du critique dans IndexedDB.
+		 * @param {Array<Array<number>>} actorWeights - Poids de l'acteur.
+		 * @param {Array<number>} criticWeights - Poids du critique.
+		 * @param {number} reward - Meilleure récompense globale.
+		 * @param {number} circlesCollected - Nombre de ronds collectés pour la meilleure récompense.
+		 * @param {number} currentGen - La génération actuelle.
+		 */
+		async function saveWeightsToIndexedDB(actorWeights, criticWeights, reward, circlesCollected, currentGen) {
+			if (!db) {
+				try {
+					db = await openDatabase();
+				} catch (error) {
+					console.error("Failed to open IndexedDB for saving:", error);
+					return;
+				}
+			}
+
+			const transaction = db.transaction([STORE_NAME], 'readwrite');
+			const store = transaction.objectStore(STORE_NAME);
+
+			const data = {
+				id: 'bestAgent', // Clé unique pour stocker un seul meilleur agent
+				actorWeights: actorWeights,
+				criticWeights: criticWeights,
+				bestReward: reward,
+				bestCircles: circlesCollected,
+				currentGeneration: currentGen, // Sauvegarde la génération actuelle
+				timestamp: new Date().toISOString()
+			};
+
+			const request = store.put(data);
+
+			request.onsuccess = () => {
+				log("Agent weights saved to IndexedDB.");
+			};
+
+			request.onerror = (event) => {
+				console.error("Error saving to IndexedDB:", event.target.error);
+			};
+		}
+
+		/**
+		 * Charge les poids de l'acteur et du critique depuis IndexedDB.
+		 * @returns {Promise<object|null>} L'objet contenant les poids et autres données ou null si non trouvé.
+		 */
+		async function loadWeightsFromIndexedDB() {
+			if (!db) {
+				try {
+					db = await openDatabase();
+				} catch (error) {
+					console.error("Failed to open IndexedDB for loading:", error);
+					return null;
+				}
+			}
+
+			return new Promise((resolve) => {
+				const transaction = db.transaction([STORE_NAME], 'readonly');
+				const store = transaction.objectStore(STORE_NAME);
+				const request = store.get('bestAgent');
+
+				request.onsuccess = (event) => {
+					const data = event.target.result;
+					if (data) {
+						log("Agent weights loaded from IndexedDB.");
+						resolve({
+							actorWeights: data.actorWeights,
+							criticWeights: data.criticWeights,
+							bestReward: data.bestReward,
+							bestCircles: data.bestCircles,
+							currentGeneration: data.currentGeneration || 0 // Charge la génération, ou 0 par défaut
+						});
+					} else {
+						log("No agent weights found in IndexedDB.");
+						resolve(null);
+					}
+				};
+
+				request.onerror = (event) => {
+					console.error("Error loading from IndexedDB:", event.target.error);
+					resolve(null);
+				};
+			});
+		}
+
+		/**
+		 * Efface toutes les données de la base de données IndexedDB.
+		 */
+		async function clearIndexedDB() {
+			if (!db) {
+				try {
+					db = await openDatabase();
+				} catch (error) {
+					console.error("Failed to open IndexedDB for clearing:", error);
+					return;
+				}
+			}
+
+			return new Promise((resolve) => {
+				const transaction = db.transaction([STORE_NAME], 'readwrite');
+				const store = transaction.objectStore(STORE_NAME);
+				const request = store.clear();
+
+				request.onsuccess = () => {
+					log("IndexedDB cleared successfully.");
+					resolve();
+				};
+
+				request.onerror = (event) => {
+					console.error("Error clearing IndexedDB:", event.target.error);
+					resolve(); // Resolve even on error to allow UI update
+				};
+			});
+		}
+
+
+		// --- Fonctions utilitaires ---
+		function getRandomInt(min, max) {
+			return Math.floor(Math.random() * (max - min + 1)) + min;
+		}
+
+		function log(message) {
+			console.log(message);
+		}
+
+		// Fonction pour mettre à jour les paramètres de récompense/pénalité depuis l'UI
+		function updateRewardParameters() {
+			COLLECTION_DISTANCE_THRESHOLD = parseFloat(collectionDistanceThresholdInput.value);
+			PENALTY_STAGNATION = parseFloat(stagnationPenaltyInput.value);
+			STAGNATION_THRESHOLD_STEPS = parseInt(stagnationThresholdStepsInput.value);
+			PENALTY_ACTION_CHANGE = parseFloat(actionChangePenaltyInput.value);
+			// Mettez à jour les autres si vous voulez les rendre configurables
+			// REWARD_COLLECT_CIRCLE = parseFloat(someOtherInput.value);
+		}
+
+
+		// --- Fonctions de l'Environnement (pour l'évaluation des individus) ---
+		function generateCircle() {
+			let newCircleX, newCircleY;
+			let collision;
+			do {
+				collision = false;
+				newCircleX = getRandomInt(CIRCLE_RADIUS, canvas.width - CIRCLE_RADIUS);
+				newCircleY = getRandomInt(CIRCLE_RADIUS, canvas.height - CIRCLE_RADIUS);
+				if (newCircleX + CIRCLE_RADIUS > squareX && newCircleX - CIRCLE_RADIUS < squareX + SQUARE_SIZE &&
+					newCircleY + CIRCLE_RADIUS > squareY && newCircleY - CIRCLE_RADIUS < squareY + SQUARE_SIZE) {
+					collision = true;
+				}
+				for (const existingCircle of circles) {
+					const dx = newCircleX - existingCircle.x;
+					const dy = newCircleY - existingCircle.y;
+					const distance = Math.sqrt(dx * dx + dy * dy);
+					if (distance < (CIRCLE_RADIUS * 2)) {
+						collision = true;
+						break;
+					}
+				}
+			} while (collision);
+			circles.push({ x: newCircleX, y: newCircleY });
+		}
+
+		function resetGameEnvironment() {
+			squareX = canvas.width / 2 - SQUARE_SIZE / 2;
+			squareY = canvas.height / 2 - SQUARE_SIZE / 2;
+			circles = [];
+			for (let i = 0; i < MAX_CIRCLES; i++) {
+				generateCircle();
+			}
+
+			// Réinitialisation des variables d'état pour les récompenses
+			lastSquareX = squareX;
+			lastSquareY = squareY;
+			inactivitySteps = 0;
+			lastActionIndex = -1;
+			repetitiveActionSteps = 0;
+			episodeWallHit = false;
+			actionHistoryBuffer = [];
+			previousDistanceToClosestCircle = undefined;
+			stagnationTrackingSteps = 0;
+		}
+
+		function getCurrentState() {
+			let closestCircle = null;
+			let minDistance = Infinity;
+
+			if (circles.length === 0) {
+				generateCircle();
+			}
+
+			circles.forEach(circle => {
+				const dx = squareX + SQUARE_SIZE / 2 - circle.x;
+				const dy = squareY + SQUARE_SIZE / 2 - circle.y;
+				const distance = Math.sqrt(dx * dx + dy * dy);
+				if (distance < minDistance) {
+					minDistance = distance;
+					closestCircle = circle;
+				}
+			});
+
+			// Normalisation des valeurs de l'état entre 0 et 1
+			const stateFeatures = [
+				squareX / canvas.width,
+				squareY / canvas.height,
+				(closestCircle ? closestCircle.x : 0) / canvas.width,
+				(closestCircle ? closestCircle.y : 0) / canvas.height,
+				(closestCircle ? minDistance : 0) / Math.sqrt(canvas.width * canvas.width + canvas.height * canvas.height)
+			];
+			return { stateFeatures, minDistance, closestCircle };
+		}
+
+		/**
+		 * Effectue un pas dans l'environnement, met à jour la position du carré,
+		 * vérifie les collisions et calcule la récompense pour ce pas.
+		 * @param {number} actionIndex - L'action choisie par l'agent (0:Haut, 1:Bas, 2:Gauche, 3:Droite).
+		 * @param {number} timeStep - Le numéro du pas de temps actuel dans l'épisode.
+		 * @returns {object} Un objet contenant la récompense pour ce pas et le nombre de ronds collectés.
+		 */
+		function stepEnvironmentAndGetReward(actionIndex, timeStep) {
+			let currentReward = PENALTY_PER_STEP;
+			let collectedCount = 0;
+
+			const { minDistance: currentDistanceToClosest, closestCircle } = getCurrentState();
+			if (previousDistanceToClosestCircle === undefined) {
+				previousDistanceToClosestCircle = currentDistanceToClosest;
+			}
+
+			// Malus d'oscillation (Malus Supplémentaire)
+			if (lastActionIndex !== -1 && actionIndex !== lastActionIndex) {
+				currentReward += PENALTY_ACTION_CHANGE;
+			}
+
+			let nextSquareX = squareX;
+			let nextSquareY = squareY;
+
+			switch (actionIndex) {
+				case 0: nextSquareY -= SQUARE_SPEED; break;
+				case 1: nextSquareY += SQUARE_SPEED; break;
+				case 2: nextSquareX -= SQUARE_SPEED; break;
+				case 3: nextSquareX += SQUARE_SPEED; break;
+			}
+
+			const willHitWall = (nextSquareX < 0 || nextSquareX > canvas.width - SQUARE_SIZE ||
+				nextSquareY < 0 || nextSquareY > canvas.height - SQUARE_SIZE);
+			if (willHitWall) {
+				currentReward += PENALTY_WALL_HIT_PER_STEP;
+				episodeWallHit = true;
+			}
+
+			squareX = Math.max(0, Math.min(canvas.width - SQUARE_SIZE, nextSquareX));
+			squareY = Math.max(0, Math.min(canvas.height - SQUARE_SIZE, nextSquareY));
+
+			// Détection d'inactivité (Malus 3)
+			if (squareX === lastSquareX && squareY === lastSquareY) {
+				inactivitySteps++;
+			} else {
+				inactivitySteps = 0;
+			}
+			lastSquareX = squareX;
+			lastSquareY = squareY;
+
+			// Malus de stagnation (Nouveau Malus)
+			// Si immobile ET proche d'un cercle sans le ramasser, incrémente le compteur de stagnation
+			if (inactivitySteps > 0 && currentDistanceToClosest > (CIRCLE_RADIUS + SQUARE_SIZE / 2) && currentDistanceToClosest < PROXIMITY_THRESHOLD) {
+				stagnationTrackingSteps++;
+				if (stagnationTrackingSteps >= STAGNATION_THRESHOLD_STEPS) {
+					currentReward += PENALTY_STAGNATION;
+				}
+			} else {
+				stagnationTrackingSteps = 0; // Réinitialise si bouge ou ramasse ou s'éloigne
+			}
+
+
+			// Détection d'actions répétitives (Malus 4) - seulement si pas de ronds ramassés
+			// Le check `collectedCount === 0` est fait APRÈS la collecte pour être précis
+			const previousCollectedCount = collectedCount; // Sauvegarde l'état de collecte avant le check
+			if (actionIndex === lastActionIndex && previousCollectedCount === 0) {
+				repetitiveActionSteps++;
+				if (repetitiveActionSteps >= REPETITIVE_ACTION_THRESHOLD_STEPS) {
+					currentReward += PENALTY_REPETITIVE_ACTION;
+				}
+			} else {
+				repetitiveActionSteps = 0;
+			}
+			lastActionIndex = actionIndex; // Met à jour pour le prochain pas
+
+			// Mettre à jour l'historique des actions (Bonus 3: Variation d'actions)
+			actionHistoryBuffer.push(actionIndex);
+			if (actionHistoryBuffer.length > ACTION_HISTORY_BUFFER_SIZE) {
+				actionHistoryBuffer.shift();
+			}
+			const uniqueActions = new Set(actionHistoryBuffer).size;
+			if (uniqueActions >= MIN_UNIQUE_ACTIONS_FOR_BONUS) {
+				currentReward += BONUS_ACTION_VARIATION_PER_STEP;
+			}
+
+			// Vérifie les collisions avec les cercles (Bonus 1 + Détection par distance)
+			for (let i = circles.length - 1; i >= 0; i--) {
+				const circle = circles[i];
+				const dx = (squareX + SQUARE_SIZE / 2) - circle.x;
+				const dy = (squareY + SQUARE_SIZE / 2) - circle.y;
+				const distance = Math.sqrt(dx * dx + dy * dy);
+
+				// Collection par distance (Nouveau comportement)
+				if (distance < (CIRCLE_RADIUS + SQUARE_SIZE / 2 + COLLECTION_DISTANCE_THRESHOLD)) {
+					circles.splice(i, 1);
+					currentReward += REWARD_COLLECT_CIRCLE;
+					collectedCount++;
+
+					// Bonus 2: Rapidité de collecte après le début de l'épisode
+					currentReward += Math.max(0, BONUS_QUICK_COLLECTION_BASE - (timeStep * BONUS_QUICK_COLLECTION_DECAY));
+
+					if (circles.length < MAX_CIRCLES) {
+						generateCircle();
+					}
+				}
+			}
+
+			// Bonus 4: Se rapprocher d'un objet
+			const { minDistance: newDistanceToClosest } = getCurrentState();
+			if (newDistanceToClosest < previousDistanceToClosestCircle && newDistanceToClosest > 0 && newDistanceToClosest < PROXIMITY_THRESHOLD) {
+				currentReward += BONUS_PROXIMITY;
+			}
+			previousDistanceToClosestCircle = newDistanceToClosest;
+
+			return { reward: currentReward, collectedCount: collectedCount };
+		}
+
+
+		/**
+		 * Évalue la performance d'un individu (agent ActorCritic) sur un nombre donné d'épisodes.
+		 * L'individu apprend (via Actor-Critic) pendant ces épisodes si isTrainingRun est vrai.
+		 * @param {ActorCritic} agent - L'instance de l'agent à évaluer.
+		 * @param {number} numEpisodes - Le nombre d'épisodes pour l'évaluation.
+		 * @param {boolean} isTrainingRun - Vrai si c'est un run d'entraînement (avec apprentissage), faux sinon.
+		 * @returns {object} Un objet contenant la récompense totale accumulée et les ronds ramassés.
+		 */
+		async function evaluateIndividual(agent, numEpisodes, isTrainingRun = true) {
+			let totalReward = 0;
+			let totalCirclesCollected = 0;
+			const MAX_TIME_STEPS_PER_EPISODE = 300;
+
+			for (let i = 0; i < numEpisodes; i++) {
+				if (!isTraining) {
+					log("evaluateIndividual: Entraînement interrompu (début épisode).");
+					return { totalReward, totalCirclesCollected };
+				}
+
+				resetGameEnvironment();
+				let episodeReward = 0;
+				let episodeCirclesCollected = 0;
+				let timeStep = 0;
+				let episodeTerminatedEarlyWithoutCollection = false;
+
+				while (timeStep < MAX_TIME_STEPS_PER_EPISODE) {
+					if (!isTraining) {
+						log("evaluateIndividual: Entraînement interrompu (dans boucle pas de temps).");
+						break;
+					}
+
+					timeStep++;
+					const { stateFeatures: state } = getCurrentState();
+					const actionIndex = agent.selectAction(state);
+
+					const { reward: stepReward, collectedCount: stepCollectedCount } = stepEnvironmentAndGetReward(actionIndex, timeStep);
+
+					episodeReward += stepReward;
+					episodeCirclesCollected += stepCollectedCount;
+
+					if (isTrainingRun) {
+						const { stateFeatures: nextState } = getCurrentState();
+						const done = (timeStep >= MAX_TIME_STEPS_PER_EPISODE || circles.length === 0);
+						agent.train(state, actionIndex, stepReward, nextState, done);
+					}
+
+					if (circles.length === 0 || timeStep >= MAX_TIME_STEPS_PER_EPISODE) {
+						episodeTerminatedEarlyWithoutCollection = (episodeCirclesCollected === 0 && timeStep < EARLY_END_TIME_THRESHOLD);
+						break;
+					}
+				}
+				totalReward += episodeReward;
+				totalCirclesCollected += episodeCirclesCollected;
+
+				// Bonus 5: Si l'agent n'a pas heurté de mur pendant tout l'épisode
+				if (!episodeWallHit) {
+					totalReward += BONUS_NO_WALL_HIT_EPISODE;
+				}
+
+				// Malus 5: Si l'épisode se termine trop vite sans rien ramasser
+				if (episodeTerminatedEarlyWithoutCollection) {
+					totalReward += PENALTY_EARLY_EMPTY_EPISODE;
+				}
+			}
+			return { totalReward, totalCirclesCollected };
+		}
+
+		/**
+		 * Croise les poids de deux parents pour créer un nouvel enfant (uniform crossover).
+		 * @param {Array<Array<number>>} parent1Weights - Les poids du premier parent.
+		 * @param {Array<Array<number>>} parent2Weights - Les poids du second parent.
+		 * @returns {Array<Array<number>>} Les poids du nouvel enfant.
+		 */
+		function crossover(parent1Weights, parent2Weights) {
+			const childWeights = JSON.parse(JSON.stringify(parent1Weights));
+			for (let i = 0; i < parent1Weights.length; i++) {
+				for (let j = 0; j < parent1Weights[i].length; j++) {
+					if (Math.random() < 0.5) {
+						childWeights[i][j] = parent2Weights[i][j];
+					}
+				}
+			}
+			return childWeights;
+		}
+
+		/**
+		 * Applique une mutation aux poids d'un individu.
+		 * @param {Array<Array<number>>} weights - Les poids à muter.
+		 * @param {number} mutationRate - La probabilité qu'un poids mute.
+		 * @param {number} mutationStrength - L'ampleur de la mutation.
+		 * @returns {Array<Array<number>>} Les poids mutés.
+		 */
+		function mutate(weights, mutationRate, mutationStrength = 0.1) {
+			for (let i = 0; i < weights.length; i++) {
+				for (let j = 0; j < weights[i].length; j++) {
+					if (Math.random() < mutationRate) {
+
+						weights[i][j] += (Math.random() * 2 - 1) * mutationStrength;
+					}
+				}
+			}
+			return weights;
+		}
+
+		/**
+		 * Fonction principale de l'algorithme génétique.
+		 * @param {ActorCritic|null} initialBestAgent - L'agent le mieux entraîné à partir duquel reprendre.
+		 */
+		async function runGenerations(initialBestAgent = null) {
+			log("Démarrage de l'entraînement génétique...");
+			testBestIAButton.disabled = true;
+			stopTestButtonVisual.disabled = true;
+
+			const numIndividuals = parseInt(numIndividualsInput.value);
+			const numGenerations = parseInt(numGenerationsInput.value);
+			const episodesPerIndividual = parseInt(episodesPerIndividualInput.value);
+			const mutationRate = parseFloat(mutationRateInput.value);
+			const learningRateActor = parseFloat(learningRateActorInput.value);
+			const learningRateCritic = parseFloat(learningRateCriticInput.value);
+			const gamma = parseFloat(gammaInput.value);
+			const numElitism = parseInt(numElitismInput.value);
+
+			// Mettre à jour les paramètres de récompense/pénalité au début de chaque run d'entraînement
+			updateRewardParameters();
+
+			let population = [];
+
+			if (initialBestAgent && initialBestAgent.getActorWeights() && initialBestAgent.getCriticWeights()) {
+				// Si un meilleur agent initial est fourni, l'utiliser comme le premier individu
+				population.push(initialBestAgent);
+				log("Population initialisée avec le meilleur agent chargé comme premier individu.");
+				// Remplir le reste de la population avec des mutations de cet agent
+				for (let i = 1; i < numIndividuals; i++) {
+					let newActorWeights = JSON.parse(JSON.stringify(initialBestAgent.getActorWeights()));
+					let newCriticWeights = JSON.parse(JSON.stringify(initialBestAgent.getCriticWeights()));
+					newActorWeights = mutate(newActorWeights, mutationRate);
+					newCriticWeights = mutate(newCriticWeights, mutationRate);
+					population.push(new ActorCritic(
+						learningRateActor, learningRateCritic, gamma,
+						getCurrentState().stateFeatures.length, 4,
+						newActorWeights, newCriticWeights
+					));
+				}
+			} else {
+				// Sinon, initialiser avec des agents aléatoires
+				log("Population initialisée avec des agents aléatoires.");
+				for (let i = 0; i < numIndividuals; i++) {
+					population.push(new ActorCritic(
+						learningRateActor,
+						learningRateCritic,
+						gamma,
+						getCurrentState().stateFeatures.length,
+						4
+					));
+				}
+			}
+
+			// Définir la génération de départ pour cette exécution d'entraînement
+			const startGeneration = currentGeneration; // Utilisez la génération globale actuelle
+
+			for (let gen = startGeneration; gen < startGeneration + numGenerations; gen++) {
+				if (!isTraining) {
+					log(`runGenerations: Entraînement interrompu après ${currentGeneration} générations.`);
+					break;
+				}
+				currentGeneration = gen + 1; // Met à jour la variable globale de la génération actuelle
+				currentGenerationSpan.textContent = currentGeneration;
+				log(`--- Génération ${currentGeneration} ---`);
+
+				let individualsWithFitness = [];
+
+				for (let i = 0; i < numIndividuals; i++) {
+					const agent = population[i];
+
+					const { totalReward: fitness, totalCirclesCollected: circlesCollectedByIndividual } = await evaluateIndividual(agent, episodesPerIndividual, true);
+
+
+					if (!isTraining) {
+						log("runGenerations: Sortie de l'évaluation individuelle car l'entraînement a été arrêté.");
+						break;
+					}
+
+					individualsWithFitness.push({ agent, fitness, circlesCollectedByIndividual });
+
+
+					if (i % Math.max(1, Math.floor(numIndividuals / 5)) === 0) {
+						log(`  Individu ${i + 1}/${numIndividuals}: Fitness = ${fitness.toFixed(2)} (Ronds: ${circlesCollectedByIndividual})`);
+					}
+				}
+
+				if (!isTraining) break;
+
+
+				individualsWithFitness.sort((a, b) => b.fitness - a.fitness);
+
+				const bestFitnessThisGen = individualsWithFitness[0].fitness;
+				const bestCirclesThisGen = individualsWithFitness[0].circlesCollectedByIndividual;
+
+				log(`Meilleure fitness de la génération ${currentGeneration}: ${bestFitnessThisGen.toFixed(2)} (Ronds: ${bestCirclesThisGen})`);
+
+
+				if (bestFitnessThisGen > bestRewardAllTime) {
+					bestRewardAllTime = bestFitnessThisGen;
+					bestCirclesAllTime = bestCirclesThisGen;
+					bestRewardAllTimeSpan.textContent = bestRewardAllTime.toFixed(2);
+					bestCirclesAllTimeSpan.textContent = bestCirclesAllTime;
+					log(`Nouveau meilleur score global de la session ! Récompense : ${bestRewardAllTime.toFixed(2)} (${bestCirclesAllTime} ronds)`);
+
+
+					bestActorWeights = individualsWithFitness[0].agent.getActorWeights();
+					bestCriticWeights = individualsWithFitness[0].agent.getCriticWeights();
+
+					bestAgentInstance = new ActorCritic(
+						learningRateActor, learningRateCritic, gamma,
+						getCurrentState().stateFeatures.length, 4,
+						bestActorWeights, bestCriticWeights
+					);
+					log("Meilleure IA mise à jour, prête pour le test visuel.");
+
+					// Sauvegarde automatique dans IndexedDB, y compris la génération actuelle
+					saveWeightsToIndexedDB(bestActorWeights, bestCriticWeights, bestRewardAllTime, bestCirclesAllTime, currentGeneration);
+				}
+
+
+				const nextPopulation = [];
+
+				for (let i = 0; i < Math.min(numElitism, numIndividuals); i++) {
+					nextPopulation.push(individualsWithFitness[i].agent);
+				}
+
+
+				const numParents = Math.ceil(numIndividuals * 0.5);
+				const selectedParents = individualsWithFitness.slice(0, numParents);
+
+				while (nextPopulation.length < numIndividuals) {
+					if (!isTraining) {
+						log("runGenerations: Arrêt de la création de la nouvelle population (entraînement interrompu).");
+						break;
+					}
+
+					const parent1 = selectedParents[getRandomInt(0, selectedParents.length - 1)].agent;
+					const parent2 = selectedParents[getRandomInt(0, selectedParents.length - 1)].agent;
+
+
+					const parent1ActorWeights = parent1.getActorWeights();
+					const parent1CriticWeights = parent1.getCriticWeights();
+					const parent2ActorWeights = parent2.getActorWeights();
+					const parent2CriticWeights = parent2.getCriticWeights();
+
+
+					let childActorWeights = crossover(parent1ActorWeights, parent2ActorWeights);
+					let childCriticWeights = crossover(parent1CriticWeights, parent2CriticWeights);
+
+
+					childActorWeights = mutate(childActorWeights, mutationRate);
+					childCriticWeights = mutate(childCriticWeights, mutationRate);
+
+
+					nextPopulation.push(new ActorCritic(
+						learningRateActor, learningRateCritic, gamma,
+						getCurrentState().stateFeatures.length, 4,
+						childActorWeights, childCriticWeights
+					));
+				}
+				population = nextPopulation;
+
+
+				await new Promise(resolve => setTimeout(resolve, 0));
+			}
+
+			log(`runGenerations: Entraînement génétique terminé après ${currentGeneration} générations.`);
+			stopTraining(false);
+
+			if (bestAgentInstance) {
+				testBestIAButton.disabled = false;
+			}
+		}
+
+		// --- Fonctions de dessin du jeu ---
+		function drawGame() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+			// Dessine le carré
+			ctx.fillStyle = '#007bff';
+			ctx.fillRect(squareX, squareY, SQUARE_SIZE, SQUARE_SIZE);
+
+			// Dessine les cercles
+			ctx.fillStyle = '#00ff00';
+			circles.forEach(circle => {
+				ctx.beginPath();
+				ctx.arc(circle.x, circle.y, CIRCLE_RADIUS, 0, Math.PI * 2);
+				ctx.fill();
+			});
+		}
+
+		// --- Test Visuel de la meilleure IA ---
+		async function visualTestGameLoop() {
+			if (!isTestingVisual) {
+				return;
+			}
+
+
+			if (!bestAgentInstance) {
+				log("Erreur: L'agent de test n'est pas initialisé.");
+				stopVisualTest();
+				return;
+			}
+
+			const { stateFeatures: state } = getCurrentState();
+			const actionIndex = bestAgentInstance.selectAction(state);
+
+			const { reward: stepReward, collectedCount: stepCollectedCount } = stepEnvironmentAndGetReward(actionIndex, 0);
+
+			// Met à jour les scores de test
+			currentTestScoreSpan.textContent = (parseFloat(currentTestScoreSpan.textContent) + stepReward).toFixed(2);
+			circlesCollectedTestSpan.textContent = parseInt(circlesCollectedTestSpan.textContent) + stepCollectedCount;
+
+			drawGame();
+
+			animationFrameId = requestAnimationFrame(visualTestGameLoop);
+		}
+
+		function startVisualTest() {
+			if (!bestAgentInstance) {
+				log("Aucune IA entraînée à tester visuellement. Lancez l'entraînement d'abord.");
+				return;
+			}
+			if (isTraining) {
+				log("Veuillez arrêter l'entraînement avant de lancer le test visuel.");
+				return;
+			}
+
+			isTestingVisual = true;
+			startButton.disabled = true;
+			stopButton.disabled = true;
+			testBestIAButton.disabled = true;
+			stopTestButtonVisual.disabled = false;
+
+			resetGameEnvironment();
+			currentTestScoreSpan.textContent = '0';
+			circlesCollectedTestSpan.textContent = '0';
+
+			log("Démarrage du test visuel de la meilleure IA...");
+			visualTestGameLoop();
+		}
+
+		function stopVisualTest() {
+			isTestingVisual = false;
+			if (animationFrameId) {
+				cancelAnimationFrame(animationFrameId);
+				animationFrameId = null;
+			}
+
+			startButton.disabled = false;
+			stopButton.disabled = true;
+			testBestIAButton.disabled = false;
+			stopTestButtonVisual.disabled = true;
+
+			resetGameEnvironment();
+			drawGame();
+			log("Test visuel arrêté.");
+		}
+
+
+		// --- Gestion des événements UI ---
+
+		startButton.addEventListener('click', async () => {
+			if (!isTraining) {
+				isTraining = true;
+				startButton.disabled = true;
+				stopButton.disabled = false;
+				settingsPanel.classList.remove('open');
+
+
+				if (isTestingVisual) {
+					cancelAnimationFrame(animationFrameId);
+					animationFrameId = null;
+					isTestingVisual = false;
+					currentTestScoreSpan.textContent = '0';
+					circlesCollectedTestSpan.textContent = '0';
+					log("Test visuel interrompu au démarrage de l'entraînement génétique.");
+				}
+
+				testBestIAButton.disabled = true;
+				stopTestButtonVisual.disabled = true;
+
+				// La génération actuelle n'est PAS réinitialisée ici, elle est utilisée comme point de départ
+				// La réinitialisation est gérée par le bouton "Reset" ou la première initialisation de la page.
+
+				currentTestScoreSpan.textContent = '0';
+				circlesCollectedTestSpan.textContent = '0';
+
+				await new Promise(resolve => setTimeout(resolve, 50));
+				// Passe l'instance du meilleur agent actuellement en mémoire (chargée ou de la dernière session)
+				await runGenerations(bestAgentInstance);
+			}
+		});
+
+		stopButton.addEventListener('click', () => {
+			stopTraining(true);
+		});
+
+		function stopTraining(fromUser = false) {
+			isTraining = false;
+			startButton.disabled = false;
+			stopButton.disabled = true;
+
+			log("Entraînement arrêté" + (fromUser ? " par l'utilisateur." : " (terminé automatiquement)."));
+
+
+			if (bestAgentInstance) {
+				testBestIAButton.disabled = false;
+			}
+			stopTestButtonVisual.disabled = true;
+		}
+
+		testBestIAButton.addEventListener('click', startVisualTest);
+		stopTestButtonVisual.addEventListener('click', stopVisualTest);
+
+		settingsButton.addEventListener('click', () => {
+			settingsPanel.classList.toggle('open');
+		});
+
+		// --- Fonctions de sauvegarde/chargement via fichier ---
+
+		saveButton.addEventListener('click', () => {
+			if (bestActorWeights && bestCriticWeights) {
+				const dataToSave = {
+					actorWeights: bestActorWeights,
+					criticWeights: bestCriticWeights,
+					bestReward: bestRewardAllTime,
+					bestCircles: bestCirclesAllTime,
+					currentGeneration: currentGeneration, // Sauvegarde la génération actuelle
+					numIndividuals: parseInt(numIndividualsInput.value),
+					numGenerations: parseInt(numGenerationsInput.value),
+					episodesPerIndividual: parseInt(episodesPerIndividualInput.value),
+					mutationRate: parseFloat(mutationRateInput.value),
+					learningRateActor: parseFloat(learningRateActorInput.value),
+					learningRateCritic: parseFloat(learningRateCriticInput.value),
+					gamma: parseFloat(gammaInput.value),
+					numElitism: parseInt(numElitismInput.value),
+					collectionDistanceThreshold: parseFloat(collectionDistanceThresholdInput.value),
+					stagnationPenalty: parseFloat(stagnationPenaltyInput.value),
+					stagnationThresholdSteps: parseInt(stagnationThresholdStepsInput.value),
+					actionChangePenalty: parseFloat(actionChangePenaltyInput.value),
+					timestamp: new Date().toISOString()
+				};
+				const jsonString = JSON.stringify(dataToSave, null, 2);
+				const blob = new Blob([jsonString], { type: 'application/json' });
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = `actor_critic_agent_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+				URL.revokeObjectURL(url);
+				log("Agent configuration saved to JSON file.");
+			} else {
+				log("No trained agent to save. Please run training first.");
+			}
+		});
+
+		loadButton.addEventListener('click', () => {
+			loadFileInput.click(); // Déclenche le clic sur l'input de fichier caché
+		});
+
+		loadFileInput.addEventListener('change', (event) => {
+			const file = event.target.files[0];
+			if (!file) {
+				return;
+			}
+
+			const reader = new FileReader();
+			reader.onload = async (e) => {
+				try {
+					const loadedData = JSON.parse(e.target.result);
+
+					// Charger les poids
+					if (loadedData.actorWeights && loadedData.criticWeights) {
+						bestActorWeights = loadedData.actorWeights;
+						bestCriticWeights = loadedData.criticWeights;
+
+						// Mettre à jour les statistiques globales
+						bestRewardAllTime = loadedData.bestReward || 0;
+						bestCirclesAllTime = loadedData.bestCircles || 0;
+						currentGeneration = loadedData.currentGeneration || 0; // Charge la génération depuis le fichier
+
+						bestAgentInstance = new ActorCritic(
+							parseFloat(learningRateActorInput.value),
+							parseFloat(learningRateCriticInput.value),
+							parseFloat(gammaInput.value),
+							getCurrentState().stateFeatures.length,
+							4,
+							bestActorWeights,
+							bestCriticWeights
+						);
+						log("Agent weights loaded from file.");
+
+						bestRewardAllTimeSpan.textContent = bestRewardAllTime.toFixed(2);
+						bestCirclesAllTimeSpan.textContent = bestCirclesAllTime;
+						currentGenerationSpan.textContent = `${currentGeneration} (Chargé)`; // Indique la génération chargée
+
+						// Mettre à jour les paramètres de l'UI si présents dans le fichier
+						if (loadedData.numIndividuals) numIndividualsInput.value = loadedData.numIndividuals;
+						if (loadedData.numGenerations) numGenerationsInput.value = loadedData.numGenerations;
+						if (loadedData.episodesPerIndividual) episodesPerIndividualInput.value = loadedData.episodesPerIndividual;
+						if (loadedData.mutationRate) mutationRateInput.value = loadedData.mutationRate;
+						if (loadedData.learningRateActor) learningRateActorInput.value = loadedData.learningRateActor;
+						if (loadedData.learningRateCritic) learningRateCriticInput.value = loadedData.learningRateCritic;
+						if (loadedData.gamma) gammaInput.value = loadedData.gamma;
+						if (loadedData.numElitism) numElitismInput.value = loadedData.numElitism;
+						if (loadedData.collectionDistanceThreshold) collectionDistanceThresholdInput.value = loadedData.collectionDistanceThreshold;
+						if (loadedData.stagnationPenalty) stagnationPenaltyInput.value = loadedData.stagnationPenalty;
+						if (loadedData.stagnationThresholdSteps) stagnationThresholdStepsInput.value = loadedData.stagnationThresholdSteps;
+						if (loadedData.actionChangePenalty) actionChangePenaltyInput.value = loadedData.actionChangePenalty;
+
+						updateRewardParameters(); // S'assurer que les variables globales sont synchronisées
+
+						testBestIAButton.disabled = false; // Permet de tester l'IA chargée
+						stopTestButtonVisual.disabled = true; // Pas de test en cours
+						startButton.disabled = false; // Permet de démarrer un nouvel entraînement
+						stopButton.disabled = true; // Pas d'entraînement en cours
+
+						// Effacer les données d'IndexedDB pour éviter des conflits si l'utilisateur charge et oublie
+						await clearIndexedDB();
+						log("IndexedDB cleared after loading from file to prevent auto-loading conflicts.");
+
+					} else {
+						log("Données d'agent invalides ou incomplètes dans le fichier.");
+					}
+				} catch (e) {
+					console.error("Erreur lors de l'analyse ou du chargement du fichier :", e);
+					log("Échec du chargement de l'agent à partir du fichier. Assurez-vous que c'est un JSON valide.");
+				}
+			};
+			reader.readAsText(file);
+		});
+
+		resetButton.addEventListener('click', async () => {
+			if (confirm("Êtes-vous sûr de vouloir RÉINITIALISER complètement toutes les données et paramètres d'entraînement ? Cela effacera également les données sauvegardées dans le stockage local de votre navigateur.")) {
+				isTraining = false;
+				isTestingVisual = false;
+				if (animationFrameId) {
+					cancelAnimationFrame(animationFrameId);
+					animationFrameId = null;
+				}
+
+				// Réinitialiser les variables d'état d'entraînement globales
+				bestRewardAllTime = 0;
+				bestCirclesAllTime = 0;
+				bestActorWeights = null;
+				bestCriticWeights = null;
+				bestAgentInstance = null;
+				currentGeneration = 0; // Réinitialise la génération à 0
+
+				// Réinitialiser les éléments de l'interface utilisateur aux valeurs par défaut
+				currentGenerationSpan.textContent = '0';
+				bestRewardAllTimeSpan.textContent = '0';
+				bestCirclesAllTimeSpan.textContent = '0';
+				currentTestScoreSpan.textContent = '0';
+				circlesCollectedTestSpan.textContent = '0';
+
+				// Réinitialiser les champs de saisie de l'interface utilisateur à leurs valeurs initiales
+				numIndividualsInput.value = 10;
+				numGenerationsInput.value = 100;
+				episodesPerIndividualInput.value = 50;
+				mutationRateInput.value = 0.05;
+				learningRateActorInput.value = 0.001;
+				learningRateCriticInput.value = 0.005;
+				gammaInput.value = 0.99;
+				numElitismInput.value = 1;
+				collectionDistanceThresholdInput.value = 10;
+				stagnationPenaltyInput.value = -0.2;
+				stagnationThresholdStepsInput.value = 30;
+				actionChangePenaltyInput.value = -0.02;
+
+				updateRewardParameters(); // Synchronise les variables globales avec les valeurs par défaut de l'UI
+
+				// Réinitialiser les états des boutons
+				startButton.disabled = false;
+				stopButton.disabled = true;
+				testBestIAButton.disabled = true;
+				stopTestButtonVisual.disabled = true;
+
+				// Effacer IndexedDB
+				await clearIndexedDB();
+				log("Toutes les données d'entraînement et le cache local ont été réinitialisés.");
+
+				resetGameEnvironment();
+				drawGame();
+			}
+		});
+
+		clearCacheButton.addEventListener('click', async () => {
+			if (confirm("Êtes-vous sûr de vouloir effacer les données d'entraînement sauvegardées localement dans le cache de votre navigateur ? Cela n'affectera pas la session d'entraînement actuelle.")) {
+				await clearIndexedDB();
+				// Ne réinitialise pas bestActorWeights, bestCriticWeights, bestAgentInstance ici
+				// car l'entraînement en cours pourrait vouloir continuer.
+				// Cependant, le test visuel sera désactivé s'il n'y a plus d'agent en mémoire après un rechargement.
+				if (!isTraining) { // Si l'entraînement n'est pas en cours, désactiver le bouton de test
+					bestActorWeights = null;
+					bestCriticWeights = null;
+					bestAgentInstance = null;
+					testBestIAButton.disabled = true; // Désactiver le bouton de test s'il n'y a pas d'agent en mémoire
+				}
+				log("Cache des données d'entraînement local effacé.");
+			}
+		});
+
+
+		// --- Initialisation au chargement de la fenêtre ---
+		window.onload = async function () {
+			// Configuration initiale de la zone de jeu
+			resetGameEnvironment();
+			drawGame();
+
+			// Initialise IndexedDB et tente de charger les données
+			await openDatabase();
+			const loadedData = await loadWeightsFromIndexedDB();
+			if (loadedData) {
+				bestActorWeights = loadedData.actorWeights;
+				bestCriticWeights = loadedData.criticWeights;
+				bestRewardAllTime = loadedData.bestReward || 0;
+				bestCirclesAllTime = loadedData.bestCircles || 0;
+				currentGeneration = loadedData.currentGeneration || 0; // Charge la génération au démarrage
+
+				bestAgentInstance = new ActorCritic(
+					parseFloat(learningRateActorInput.value),
+					parseFloat(learningRateCriticInput.value),
+					parseFloat(gammaInput.value),
+					getCurrentState().stateFeatures.length,
+					4,
+					bestActorWeights,
+					bestCriticWeights
+				);
+
+				bestRewardAllTimeSpan.textContent = bestRewardAllTime.toFixed(2);
+				bestCirclesAllTimeSpan.textContent = bestCirclesAllTime;
+				currentGenerationSpan.textContent = `${currentGeneration} (Chargé)`; // Indique que c'est des données chargées
+
+				testBestIAButton.disabled = false; // Active le bouton de test si un agent est chargé
+				log("Session d'entraînement précédente chargée depuis IndexedDB.");
+			} else {
+				testBestIAButton.disabled = true; // Garde le bouton de test désactivé si aucun agent
+				log("Aucune session d'entraînement précédente trouvée.");
+			}
+
+			updateRewardParameters(); // Initialise les paramètres de récompense au chargement
+			log("Prêt à commencer l'entraînement génétique.");
+			log("Le jeu est prêt. Lancez l'entraînement pour qu'une IA soit disponible pour le test visuel.");
+		};
+
+	</script>
+
+	<script>
+		// ia.js - Implémentation de l'IA Actor-Critic (avec support génétique)
+
+		class ActorCritic {
+			constructor(learningRateActor, learningRateCritic, gamma, numStates, numActions, initialActorWeights = null, initialCriticWeights = null) {
+				this.lrActor = learningRateActor;
+				this.lrCritic = learningRateCritic;
+				this.gamma = gamma;
+				this.numActions = numActions;
+				this.numStates = numStates;
+
+				// Initialisation des poids de l'acteur
+				if (initialActorWeights) {
+					this.actorWeights = JSON.parse(JSON.stringify(initialActorWeights));
+				} else {
+					this.actorWeights = Array(numActions).fill(null).map(() =>
+						Array(numStates).fill(null).map(() => Math.random() * 0.2 - 0.1)
+					);
+				}
+
+				// Initialisation des poids du critique
+				if (initialCriticWeights) {
+					this.criticWeights = JSON.parse(JSON.stringify(initialCriticWeights));
+				} else {
+					this.criticWeights = Array(numStates).fill(null).map(() => Math.random() * 0.2 - 0.1);
+				}
+			}
+
+			predictCriticValue(stateFeatures) {
+				let value = 0;
+				for (let i = 0; i < stateFeatures.length; i++) {
+					value += stateFeatures[i] * this.criticWeights[i];
+				}
+				return value;
+			}
+
+			predictActorScores(stateFeatures) {
+				const scores = Array(this.numActions).fill(0);
+				for (let action = 0; action < this.numActions; action++) {
+					for (let i = 0; i < stateFeatures.length; i++) {
+						scores[action] += stateFeatures[i] * this.actorWeights[action][i];
+					}
+				}
+				return scores;
+			}
+
+			softmax(scores) {
+				const maxScore = Math.max(...scores);
+				const expScores = scores.map(score => Math.exp(score - maxScore));
+				const sumExpScores = expScores.reduce((sum, val) => sum + val, 0);
+				return expScores.map(score => score / sumExpScores);
+			}
+
+			selectAction(stateFeatures) {
+				const actionScores = this.predictActorScores(stateFeatures);
+				const actionProbabilities = this.softmax(actionScores);
+
+				let cumulativeProbability = 0;
+				const r = Math.random();
+				for (let i = 0; i < this.numActions; i++) {
+					cumulativeProbability += actionProbabilities[i];
+					if (r <= cumulativeProbability) {
+						return i;
+					}
+				}
+				return this.numActions - 1;
+			}
+
+			train(state, actionIndex, reward, nextState, done) {
+				const currentV = this.predictCriticValue(state);
+				const nextV = done ? 0 : this.predictCriticValue(nextState);
+				const targetG = reward + this.gamma * nextV;
+				const tdError = targetG - currentV;
+
+				for (let i = 0; i < state.length; i++) {
+					this.criticWeights[i] += this.lrCritic * tdError * state[i];
+				}
+
+				for (let i = 0; i < state.length; i++) {
+					this.actorWeights[actionIndex][i] += this.lrActor * tdError * state[i];
+				}
+			}
+
+			getActorWeights() {
+				return JSON.parse(JSON.stringify(this.actorWeights));
+			}
+
+			setActorWeights(newWeights) {
+				this.actorWeights = JSON.parse(JSON.stringify(newWeights));
+			}
+
+			getCriticWeights() {
+				return JSON.parse(JSON.stringify(this.criticWeights));
+			}
+
+			setCriticWeights(newWeights) {
+				this.criticWeights = JSON.parse(JSON.stringify(newWeights));
+			}
+		}
+	</script>
 </body>
+
 </html>
