@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Entraînement IA Actor-Critic (Génétique)</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
         <style>
                 /* Importation de la police Inter pour un look moderne et lisible */
                 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -198,14 +199,14 @@
                         width: 100%;
                 }
 
-                /* AJOUT: Définit le gris par défaut pour les valeurs de score */
+                /* Définit le gris par défaut pour les valeurs de score */
                 #bestRewardAllTime, #bestCirclesAllTimeSpan {
                     font-weight: 600;
                     color: var(--text-muted); /* Gris initial */
                     transition: color 0.5s ease-in-out; /* Transition douce pour la couleur */
                 }
 
-                /* AJOUT: Classe pour le vert quand un record est atteint */
+                /* Classe pour le vert quand un record est atteint */
                 .record-achieved-color {
                     color: var(--accent-color-green) !important; /* Vert vif */
                 }
@@ -225,6 +226,18 @@
                     padding-top: 15px;
                     border-top: 1px solid var(--border-color);
                 }
+
+                /* Conteneur pour les statistiques - AJUSTÉ */
+                .stats-and-chart-wrapper {
+                    display: flex;
+                    flex-wrap: wrap; /* Permet le passage à la ligne sur petits écrans */
+                    gap: 30px;
+                    justify-content: center; /* Centre le panneau de stats si pas de graphique */
+                    width: 100%;
+                }
+
+                /* Les styles pour .learning-curve-panel et canvas #learningCurveCanvas sont supprimés */
+
 
                 .game-area-wrapper {
                         display: flex;
@@ -333,7 +346,7 @@
                     width: 80px;
                 }
 
-                /* AJOUT: Style pour le conteneur du checkbox */
+                /* Style pour le conteneur du checkbox */
                 .settings-panel .checkbox-group {
                     display: flex;
                     align-items: center;
@@ -344,6 +357,7 @@
 
                 .settings-toggle-button {
                     background: var(--primary-gradient);
+                    background-size: 200% auto;
                     color: white;
                     border: none;
                     padding: 12px 15px;
@@ -375,6 +389,14 @@
                     .container {
                         margin: 0 10px;
                         padding: 20px;
+                    }
+                    /* Ajustement pour les petits écrans */
+                    .stats-and-chart-wrapper {
+                        flex-direction: column;
+                    }
+                    .training-stats-panel {
+                        max-width: 100%;
+                        margin: 0;
                     }
                 }
 
@@ -413,11 +435,20 @@
                                 width: 100%;
                         }
 
+                        /* Positionnement des stats et du graphique côte à côte - AJUSTÉ */
+                        .stats-and-chart-wrapper {
+                            order: 2;
+                            flex-direction: row;
+                            justify-content: center; /* Centre le panneau de stats sans graphique */
+                            align-items: flex-start;
+                        }
+
                         .training-stats-panel {
-                                order: 2;
-                                width: 100%;
+                                width: auto; /* Retour à auto pour ne pas forcer la largeur */
                                 max-width: 450px;
                         }
+
+                        /* Les styles pour .learning-curve-panel sont supprimés */
 
                         .game-area-wrapper {
                                 order: 3;
@@ -466,20 +497,24 @@
                         <button id="stopButton" disabled>Arrêter l'entraînement</button>
                 </div>
 
-                <div class="section-panel training-stats-panel">
-                        <h2>Statistiques d'entraînement</h2>
-                        <p>Génération actuelle : <span id="currentGeneration">0</span></p>
-                        <p><span class="best-score-label">Meilleur Score Global :</span> <span
-                                        id="bestRewardAllTime">0</span></p>
-                        <p>Ronds collectés (meilleur score) : <span id="bestCirclesAllTimeSpan">0</span></p>
+                <!-- Conteneur pour les statistiques (sans la courbe d'apprentissage) -->
+                <div class="stats-and-chart-wrapper">
+                    <div class="section-panel training-stats-panel">
+                            <h2>Statistiques d'entraînement</h2>
+                            <p>Génération actuelle : <span id="currentGeneration">0</span></p>
+                            <p><span class="best-score-label">Meilleur Score Global :</span> <span
+                                            id="bestRewardAllTime">0</span></p>
+                            <p>Ronds collectés (meilleur score) : <span id="bestCirclesAllTimeSpan">0</span></p>
 
-                        <div class="save-load-buttons">
-                            <button id="saveButton">Save</button>
-                            <input type="file" id="loadFileInput" accept=".json" style="display: none;">
-                            <button id="loadButton">Load</button>
-                            <button id="resetButton">Reset</button>
-                            <button id="clearCacheButton">Clear Cache</button>
-                        </div>
+                            <div class="save-load-buttons">
+                                <button id="saveButton">Save</button>
+                                <input type="file" id="loadFileInput" accept=".json" style="display: none;">
+                                <button id="loadButton">Load</button>
+                                <button id="resetButton">Reset</button>
+                                <button id="clearCacheButton">Clear Cache</button>
+                            </div>
+                    </div>
+                    <!-- Le panneau du graphique d'apprentissage a été supprimé ici -->
                 </div>
 
                 <div class="section-panel game-area-wrapper">
@@ -509,7 +544,7 @@
             <div class="checkbox-group">
                 <label for="numGenerations">Générations :</label>
                 <input type="number" id="numGenerations" value="100" step="10" min="1">
-                <label>Infini: <input type="checkbox" id="infiniteGenerationsCheckbox"></label> <!-- AJOUT -->
+                <label>Infini: <input type="checkbox" id="infiniteGenerationsCheckbox"></label>
             </div>
 
             <label for="episodesPerIndividual">Épisodes/Individu :</label>
@@ -587,7 +622,11 @@
                 const resetButton = document.getElementById('resetButton');
                 const clearCacheButton = document.getElementById('clearCacheButton');
 
-                const infiniteGenerationsCheckbox = document.getElementById('infiniteGenerationsCheckbox'); // AJOUT
+                const infiniteGenerationsCheckbox = document.getElementById('infiniteGenerationsCheckbox');
+
+                // L'historique d'entraînement n'est plus nécessaire si le graphique est retiré,
+                // mais je le garde au cas où vous voudriez le réintroduire facilement ou pour d'autres usages.
+                let trainingHistory = [];
 
 
                 // --- Paramètres du Jeu (pour l'environnement d'évaluation) ---
@@ -700,6 +739,7 @@
                  * @param {number} reward - Meilleure récompense globale.
                  * @param {number} circlesCollected - Nombre de ronds collectés pour la meilleure récompense.
                  * @param {number} currentGen - La génération actuelle.
+                 * @param {Array<object>} history - L'historique d'entraînement pour le graphique. // Supprimé
                  */
                 async function saveWeightsToIndexedDB(actorWeights, criticWeights, reward, circlesCollected, currentGen) {
                     if (!db) {
@@ -720,7 +760,8 @@
                         criticWeights: criticWeights,
                         bestReward: reward,
                         bestCircles: circlesCollected,
-                        currentGeneration: currentGen, // Sauvegarde la génération actuelle // AJOUT
+                        currentGeneration: currentGen,
+                        // trainingHistory: history, // Supprimé
                         timestamp: new Date().toISOString()
                     };
 
@@ -763,7 +804,8 @@
                                     criticWeights: data.criticWeights,
                                     bestReward: data.bestReward,
                                     bestCircles: data.bestCircles,
-                                    currentGeneration: data.currentGeneration || 0 // Charge la génération, ou 0 par défaut // AJOUT
+                                    currentGeneration: data.currentGeneration || 0, // Charge la génération, ou 0 par défaut
+                                    // trainingHistory: data.trainingHistory || [] // Supprimé
                                 });
                             } else {
                                 log("No agent weights found in IndexedDB.");
@@ -906,7 +948,7 @@
                 /**
                  * Effectue un pas dans l'environnement, met à jour la position du carré,
                  * vérifie les collisions et calcule la récompense pour ce pas.
-                 * @param {number} actionIndex - L'action choisie par l'agent (0:Haut, 1:Bas, 2:Gauche, 3:Droite, 4:Haut-Gauche, 5:Haut-Droite, 6:Bas-Gauche, 7:Bas-Droite). // AJOUT
+                 * @param {number} actionIndex - L'action choisie par l'agent (0:Haut, 1:Bas, 2:Gauche, 3:Droite, 4:Haut-Gauche, 5:Haut-Droite, 6:Bas-Gauche, 7:Bas-Droite).
                  * @param {number} timeStep - Le numéro du pas de temps actuel dans l'épisode.
                  * @returns {object} Un objet contenant la récompense pour ce pas et le nombre de ronds collectés.
                  */
@@ -927,7 +969,7 @@
                     let nextSquareX = squareX;
                     let nextSquareY = squareY;
 
-                    // AJOUT: Logique de déplacement pour 8 directions
+                    // Logique de déplacement pour 8 directions
                     switch (actionIndex) {
                         case 0: nextSquareY -= SQUARE_SPEED; break; // Haut
                         case 1: nextSquareY += SQUARE_SPEED; break; // Bas
@@ -1144,10 +1186,11 @@
                         const episodesPerIndividual = parseInt(episodesPerIndividualInput.value);
                         const mutationRate = parseFloat(mutationRateInput.value);
                         const learningRateActor = parseFloat(learningRateActorInput.value);
+                        // Correction: Utilise parseFloat directement pour éviter les problèmes de précision
                         const learningRateCritic = parseFloat(learningRateCriticInput.value);
                         const gamma = parseFloat(gammaInput.value);
                         const numElitism = parseInt(numElitismInput.value);
-                        const isInfiniteGenerations = infiniteGenerationsCheckbox.checked; // AJOUT
+                        const isInfiniteGenerations = infiniteGenerationsCheckbox.checked;
 
                         // Mettre à jour les paramètres de récompense/pénalité au début de chaque run d'entraînement
                         updateRewardParameters();
@@ -1188,7 +1231,7 @@
                         const startingGenerationForThisRun = currentGeneration;
 
                         while (isTraining) {
-                            // AJOUT: Nouvelle condition pour les générations infinies
+                            // Nouvelle condition pour les générations infinies
                             if (!isInfiniteGenerations && (currentGeneration - startingGenerationForThisRun) >= totalGenerationsToRun) {
                                 log("runGenerations: Nombre de générations spécifié atteint.");
                                 break;
@@ -1226,12 +1269,20 @@
 
                             log(`Meilleure fitness de la génération ${currentGeneration}: ${bestFitnessThisGen.toFixed(2)} (Ronds: ${bestCirclesThisGen})`);
 
+                            // L'historique n'est plus utilisé pour le graphique, mais on peut le garder pour d'autres raisons
+                            // trainingHistory.push({
+                            //     generation: currentGeneration,
+                            //     bestFitness: bestFitnessThisGen,
+                            //     averageFitness: individualsWithFitness.reduce((sum, ind) => sum + ind.fitness, 0) / numIndividuals
+                            // });
+                            // updateLearningCurveChart(); // Appel supprimé
+
                             if (bestFitnessThisGen > bestRewardAllTime) {
                                 bestRewardAllTime = bestFitnessThisGen;
                                 bestCirclesAllTime = bestCirclesThisGen;
                                 bestRewardAllTimeSpan.textContent = bestRewardAllTime.toFixed(2);
                                 bestCirclesAllTimeSpan.textContent = bestCirclesAllTime;
-                                // AJOUT: Ajoute la classe pour la couleur verte
+                                // Ajoute la classe pour la couleur verte
                                 bestRewardAllTimeSpan.classList.add('record-achieved-color');
                                 bestCirclesAllTimeSpan.classList.add('record-achieved-color');
                                 log(`Nouveau meilleur score global de la session ! Récompense : ${bestRewardAllTime.toFixed(2)} (${bestCirclesAllTime} ronds)`);
@@ -1246,7 +1297,7 @@
                                 );
                                 log("Meilleure IA mise à jour, prête pour le test visuel.");
 
-                                // Sauvegarde automatique dans IndexedDB, y compris la génération actuelle
+                                // Sauvegarde automatique dans IndexedDB, sans l'historique
                                 saveWeightsToIndexedDB(bestActorWeights, bestCriticWeights, bestRewardAllTime, bestCirclesAllTime, currentGeneration);
                             }
 
@@ -1390,6 +1441,10 @@
                         log("Test visuel arrêté.");
                 }
 
+                // Fonctions Chart.js et trainingHistory supprimées
+                // function initializeLearningCurveChart() { ... }
+                // function updateLearningCurveChart() { ... }
+
 
                 // --- Gestion des événements UI ---
 
@@ -1416,9 +1471,13 @@
                                 currentTestScoreSpan.textContent = '0';
                                 circlesCollectedTestSpan.textContent = '0';
 
-                                // AJOUT: Réinitialise la couleur des scores au début d'un nouvel entraînement
+                                // Réinitialise la couleur des scores au début d'un nouvel entraînement
                                 bestRewardAllTimeSpan.classList.remove('record-achieved-color');
                                 bestCirclesAllTimeSpan.classList.remove('record-achieved-color');
+
+                                // L'historique n'est plus géré par le graphique
+                                trainingHistory = [];
+                                // updateLearningCurveChart(); // Appel supprimé
 
                                 await new Promise(resolve => setTimeout(resolve, 50));
                                 // Passe l'instance du meilleur agent actuellement en mémoire (chargée ou de la dernière session)
@@ -1451,7 +1510,7 @@
                     settingsPanel.classList.toggle('open');
                 });
 
-                // AJOUT: Listener pour la checkbox des générations infinies
+                // Listener pour la checkbox des générations infinies
                 infiniteGenerationsCheckbox.addEventListener('change', () => {
                     numGenerationsInput.disabled = infiniteGenerationsCheckbox.checked;
                 });
@@ -1478,6 +1537,7 @@
                             stagnationPenalty: parseFloat(stagnationPenaltyInput.value),
                             stagnationThresholdSteps: parseInt(stagnationThresholdStepsInput.value),
                             actionChangePenalty: parseFloat(actionChangePenaltyInput.value),
+                            // trainingHistory: trainingHistory, // Supprimé
                             timestamp: new Date().toISOString()
                         };
                         const jsonString = JSON.stringify(dataToSave, null, 2);
@@ -1519,14 +1579,14 @@
                                 // Mettre à jour les statistiques globales
                                 bestRewardAllTime = loadedData.bestReward || 0;
                                 bestCirclesAllTime = loadedData.bestCircles || 0;
-                                currentGeneration = loadedData.currentGeneration || 0; // Charge la génération depuis le fichier // AJOUT
+                                currentGeneration = loadedData.currentGeneration || 0; // Charge la génération depuis le fichier
 
                                 bestAgentInstance = new ActorCritic(
                                     parseFloat(learningRateActorInput.value),
                                     parseFloat(learningRateCriticInput.value),
                                     parseFloat(gammaInput.value),
                                     getCurrentState().stateFeatures.length,
-                                    8, // AJOUT: S'assurer que le nombre d'actions est correct lors du chargement
+                                    8, // S'assurer que le nombre d'actions est correct lors du chargement
                                     bestActorWeights,
                                     bestCriticWeights
                                 );
@@ -1536,7 +1596,12 @@
                                 bestCirclesAllTimeSpan.textContent = bestCirclesAllTime;
                                 currentGenerationSpan.textContent = `${currentGeneration} (Chargé)`; // Indique la génération chargée
 
-                                // AJOUT: Applique la couleur verte si les données chargées indiquent un meilleur score non nul
+                                // L'historique n'est plus utilisé pour le graphique
+                                trainingHistory = []; // Assurez-vous qu'il est vide après le chargement pour éviter des données résiduelles
+                                // updateLearningCurveChart(); // Appel supprimé
+
+
+                                // Applique la couleur verte si les données chargées indiquent un meilleur score non nul
                                 if (bestRewardAllTime > 0 || bestCirclesAllTime > 0) {
                                     bestRewardAllTimeSpan.classList.add('record-achieved-color');
                                     bestCirclesAllTimeSpan.classList.add('record-achieved-color');
@@ -1596,18 +1661,23 @@
                         bestActorWeights = null;
                         bestCriticWeights = null;
                         bestAgentInstance = null;
-                        currentGeneration = 0; // Réinitialise la génération à 0 // AJOUT
+                        currentGeneration = 0; // Réinitialise la génération à 0
 
                         // Réinitialiser les éléments de l'interface utilisateur aux valeurs par défaut
                         currentGenerationSpan.textContent = '0';
                         bestRewardAllTimeSpan.textContent = '0';
                         bestCirclesAllTimeSpan.textContent = '0';
-                        // AJOUT: Supprime la classe verte lors de la réinitialisation
+                        // Supprime la classe verte lors de la réinitialisation
                         bestRewardAllTimeSpan.classList.remove('record-achieved-color');
                         bestCirclesAllTimeSpan.classList.remove('record-achieved-color');
 
                         currentTestScoreSpan.textContent = '0';
                         circlesCollectedTestSpan.textContent = '0';
+
+                        // L'historique n'est plus utilisé pour le graphique
+                        trainingHistory = [];
+                        // updateLearningCurveChart(); // Appel supprimé
+
 
                         // Réinitialiser les champs de saisie de l'interface utilisateur à leurs valeurs initiales
                         numIndividualsInput.value = 10;
@@ -1622,8 +1692,8 @@
                         stagnationPenaltyInput.value = -0.2;
                         stagnationThresholdStepsInput.value = 30;
                         actionChangePenaltyInput.value = -0.02;
-                        infiniteGenerationsCheckbox.checked = false; // AJOUT
-                        numGenerationsInput.disabled = false; // AJOUT
+                        infiniteGenerationsCheckbox.checked = false;
+                        numGenerationsInput.disabled = false;
 
                         updateRewardParameters(); // Synchronise les variables globales avec les valeurs par défaut de l'UI
 
@@ -1653,10 +1723,13 @@
                             bestCriticWeights = null;
                             bestAgentInstance = null;
                             testBestIAButton.disabled = true; // Désactiver le bouton de test s'il n'y a pas d'agent en mémoire
-                            // AJOUT: S'assurer qu'ils sont gris si le cache est vidé et pas d'entraînement en cours
+                            // S'assurer qu'ils sont gris si le cache est vidé et pas d'entraînement en cours
                             bestRewardAllTimeSpan.classList.remove('record-achieved-color');
                             bestCirclesAllTimeSpan.classList.remove('record-achieved-color');
                         }
+                        // L'historique n'est plus utilisé pour le graphique
+                        trainingHistory = [];
+                        // updateLearningCurveChart(); // Appel supprimé
                         log("Cache des données d'entraînement local effacé.");
                     }
                 });
@@ -1668,6 +1741,9 @@
                         resetGameEnvironment();
                         drawGame();
 
+                        // L'initialisation du graphique est supprimée
+                        // initializeLearningCurveChart();
+
                         // Initialise IndexedDB et tente de charger les données
                         await openDatabase();
                         const loadedData = await loadWeightsFromIndexedDB();
@@ -1676,14 +1752,14 @@
                             bestCriticWeights = loadedData.criticWeights;
                             bestRewardAllTime = loadedData.bestReward || 0;
                             bestCirclesAllTime = loadedData.bestCircles || 0;
-                            currentGeneration = loadedData.currentGeneration || 0; // Charge la génération au démarrage // AJOUT
+                            currentGeneration = loadedData.currentGeneration || 0;
 
                             bestAgentInstance = new ActorCritic(
                                 parseFloat(learningRateActorInput.value),
                                 parseFloat(learningRateCriticInput.value),
                                 parseFloat(gammaInput.value),
                                 getCurrentState().stateFeatures.length,
-                                8, // AJOUT: S'assurer que le nombre d'actions est correct lors du chargement
+                                8, // S'assurer que le nombre d'actions est correct lors du chargement
                                 bestActorWeights,
                                 bestCriticWeights
                             );
@@ -1692,7 +1768,12 @@
                             bestCirclesAllTimeSpan.textContent = bestCirclesAllTime;
                             currentGenerationSpan.textContent = `${currentGeneration} (Chargé)`; // Indique que c'est des données chargées
 
-                            // AJOUT: Applique la couleur verte si les données chargées indiquent un meilleur score non nul
+                            // L'historique n'est plus utilisé pour le graphique
+                            trainingHistory = []; // S'assurer qu'il est vide après le chargement
+                            // updateLearningCurveChart(); // Appel supprimé
+
+
+                            // Applique la couleur verte si les données chargées indiquent un meilleur score non nul
                             if (bestRewardAllTime > 0 || bestCirclesAllTime > 0) {
                                 bestRewardAllTimeSpan.classList.add('record-achieved-color');
                                 bestCirclesAllTimeSpan.classList.add('record-achieved-color');
@@ -1706,7 +1787,7 @@
                         } else {
                             testBestIAButton.disabled = true; // Garde le bouton de test désactivé si aucun agent
                             log("Aucune session d'entraînement précédente trouvée.");
-                            // AJOUT: S'assurer qu'ils sont gris si aucune donnée n'est chargée
+                            // S'assurer qu'ils sont gris si aucune donnée n'est chargée
                             bestRewardAllTimeSpan.classList.remove('record-achieved-color');
                             bestCirclesAllTimeSpan.classList.remove('record-achieved-color');
                         }
@@ -1715,7 +1796,7 @@
                         log("Prêt à commencer l'entraînement génétique.");
                         log("Le jeu est prêt. Lancez l'entraînement pour qu'une IA soit disponible pour le test visuel.");
                         // Assurez-vous que l'état du champ "Générations" reflète la case à cocher infinie au démarrage.
-                        numGenerationsInput.disabled = infiniteGenerationsCheckbox.checked; // AJOUT
+                        numGenerationsInput.disabled = infiniteGenerationsCheckbox.checked;
                 };
 
         </script>
