@@ -4,9 +4,8 @@
 <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Entraînement IA Actor-Critic (Génétique)</title>
+        <title>Entraînement IA Actor-Critic</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
         <style>
                 /* Importation de la police Inter pour un look moderne et lisible */
                 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -157,7 +156,7 @@
                         font-size: 16px;
                         text-align: center;
                         transition: border-color 0.3s ease, box-shadow 0.3s ease;
-                        -moz-appearance: textfield;
+                        appearance: textfield;
                 }
 
                 input[type="number"]::-webkit-outer-spin-button,
@@ -199,16 +198,9 @@
                         width: 100%;
                 }
 
-                /* Définit le gris par défaut pour les valeurs de score */
-                #bestRewardAllTime, #bestCirclesAllTimeSpan {
-                    font-weight: 600;
-                    color: var(--text-muted); /* Gris initial */
-                    transition: color 0.5s ease-in-out; /* Transition douce pour la couleur */
-                }
-
-                /* Classe pour le vert quand un record est atteint */
-                .record-achieved-color {
-                    color: var(--accent-color-green) !important; /* Vert vif */
+                .training-stats-panel span {
+                        font-weight: 600;
+                        color: var(--accent-color-green);
                 }
 
                 .training-stats-panel .best-score-label {
@@ -218,26 +210,14 @@
 
                 /* Nouveau style pour le groupe de boutons de sauvegarde */
                 .training-stats-panel .save-load-buttons {
-                    display: flex;
-                    flex-wrap: wrap;
-                    justify-content: center;
-                    gap: 10px;
-                    margin-top: 15px;
-                    padding-top: 15px;
-                    border-top: 1px solid var(--border-color);
+                        display: flex;
+                        flex-wrap: wrap;
+                        justify-content: center;
+                        gap: 10px;
+                        margin-top: 15px;
+                        padding-top: 15px;
+                        border-top: 1px solid var(--border-color);
                 }
-
-                /* Conteneur pour les statistiques - AJUSTÉ */
-                .stats-and-chart-wrapper {
-                    display: flex;
-                    flex-wrap: wrap; /* Permet le passage à la ligne sur petits écrans */
-                    gap: 30px;
-                    justify-content: center; /* Centre le panneau de stats si pas de graphique */
-                    width: 100%;
-                }
-
-                /* Les styles pour .learning-curve-panel et canvas #learningCurveCanvas sont supprimés */
-
 
                 .game-area-wrapper {
                         display: flex;
@@ -329,75 +309,57 @@
                 }
 
                 .settings-panel h2 {
-                    text-align: left;
-                    margin-bottom: 15px;
-                    background: var(--primary-gradient);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
+                        text-align: left;
+                        margin-bottom: 15px;
+                        background: var(--primary-gradient);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        background-clip: text;
                 }
 
                 .settings-panel label {
-                    width: 100%;
-                    justify-content: space-between;
+                        width: 100%;
+                        justify-content: space-between;
                 }
 
                 .settings-panel input[type="number"] {
-                    width: 80px;
-                }
-
-                /* Style pour le conteneur du checkbox */
-                .settings-panel .checkbox-group {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    justify-content: space-between;
-                    width: 100%;
+                        width: 80px;
                 }
 
                 .settings-toggle-button {
-                    background: var(--primary-gradient);
-                    background-size: 200% auto;
-                    color: white;
-                    border: none;
-                    padding: 12px 15px;
-                    border-radius: 10px;
-                    cursor: pointer;
-                    font-size: 17px;
-                    font-weight: 600;
-                    transition: all 0.4s ease;
-                    box-shadow: 0 5px 15px var(--shadow-dark);
-                    position: relative;
-                    overflow: hidden;
-                    letter-spacing: 0.5px;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
+                        background: var(--primary-gradient);
+                        color: white;
+                        border: none;
+                        padding: 12px 15px;
+                        border-radius: 10px;
+                        cursor: pointer;
+                        font-size: 17px;
+                        font-weight: 600;
+                        transition: all 0.4s ease;
+                        box-shadow: 0 5px 15px var(--shadow-dark);
+                        position: relative;
+                        overflow: hidden;
+                        letter-spacing: 0.5px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
                 }
 
                 .settings-toggle-button:hover {
-                    transform: translateY(-3px) scale(1.02);
-                    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.9);
+                        transform: translateY(-3px) scale(1.02);
+                        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.9);
                 }
 
                 .settings-toggle-button:active {
-                    transform: translateY(-1px) scale(0.99);
-                    box-shadow: 0 3px 10px var(--shadow-dark);
+                        transform: translateY(-1px) scale(0.99);
+                        box-shadow: 0 3px 10px var(--shadow-dark);
                 }
 
                 @media (max-width: 767px) {
-                    .container {
-                        margin: 0 10px;
-                        padding: 20px;
-                    }
-                    /* Ajustement pour les petits écrans */
-                    .stats-and-chart-wrapper {
-                        flex-direction: column;
-                    }
-                    .training-stats-panel {
-                        max-width: 100%;
-                        margin: 0;
-                    }
+                        .container {
+                                margin: 0 10px;
+                                padding: 20px;
+                        }
                 }
 
                 @media (min-width: 768px) {
@@ -435,20 +397,11 @@
                                 width: 100%;
                         }
 
-                        /* Positionnement des stats et du graphique côte à côte - AJUSTÉ */
-                        .stats-and-chart-wrapper {
-                            order: 2;
-                            flex-direction: row;
-                            justify-content: center; /* Centre le panneau de stats sans graphique */
-                            align-items: flex-start;
-                        }
-
                         .training-stats-panel {
-                                width: auto; /* Retour à auto pour ne pas forcer la largeur */
+                                order: 2;
+                                width: 100%;
                                 max-width: 450px;
                         }
-
-                        /* Les styles pour .learning-curve-panel sont supprimés */
 
                         .game-area-wrapper {
                                 order: 3;
@@ -487,34 +440,30 @@
 
 <body>
         <div class="container">
-                <h1>Entraînement IA Actor-Critic (Génétique) : Carré Ramasseur de Ronds</h1>
+                <h1>Entraînement IA Actor-Critic</h1>
 
                 <div class="section-panel controls">
                         <button id="settingsButton" class="settings-toggle-button">
-                            <i class="fas fa-cog"></i>
+                                <i class="fas fa-cog"></i>
                         </button>
                         <button id="startButton">Démarrer l'entraînement Génétique</button>
                         <button id="stopButton" disabled>Arrêter l'entraînement</button>
                 </div>
 
-                <!-- Conteneur pour les statistiques (sans la courbe d'apprentissage) -->
-                <div class="stats-and-chart-wrapper">
-                    <div class="section-panel training-stats-panel">
-                            <h2>Statistiques d'entraînement</h2>
-                            <p>Génération actuelle : <span id="currentGeneration">0</span></p>
-                            <p><span class="best-score-label">Meilleur Score Global :</span> <span
-                                            id="bestRewardAllTime">0</span></p>
-                            <p>Ronds collectés (meilleur score) : <span id="bestCirclesAllTimeSpan">0</span></p>
+                <div class="section-panel training-stats-panel">
+                        <h2>Statistiques d'entraînement</h2>
+                        <p>Génération actuelle : <span id="currentGeneration">0</span></p>
+                        <p><span class="best-score-label">Meilleur Score Global :</span> <span
+                                        id="bestRewardAllTime">0</span></p>
+                        <p>Ronds collectés (meilleur score) : <span id="bestCirclesAllTimeSpan">0</span></p>
 
-                            <div class="save-load-buttons">
+                        <div class="save-load-buttons">
                                 <button id="saveButton">Save</button>
                                 <input type="file" id="loadFileInput" accept=".json" style="display: none;">
                                 <button id="loadButton">Load</button>
                                 <button id="resetButton">Reset</button>
                                 <button id="clearCacheButton">Clear Cache</button>
-                            </div>
-                    </div>
-                    <!-- Le panneau du graphique d'apprentissage a été supprimé ici -->
+                        </div>
                 </div>
 
                 <div class="section-panel game-area-wrapper">
@@ -537,47 +486,73 @@
         </div>
 
         <div id="settingsPanel" class="settings-panel">
-            <h2>Paramètres d'entraînement</h2>
-            <label for="numIndividuals">Individus :</label>
-            <input type="number" id="numIndividuals" value="10" step="1" min="2">
+                <h2>Paramètres d'entraînement</h2>
+                <label for="numIndividuals">Individus :</label>
+                <input type="number" id="numIndividuals" value="10" step="1" min="2">
 
-            <div class="checkbox-group">
                 <label for="numGenerations">Générations :</label>
                 <input type="number" id="numGenerations" value="100" step="10" min="1">
-                <label>Infini: <input type="checkbox" id="infiniteGenerationsCheckbox"></label>
-            </div>
 
-            <label for="episodesPerIndividual">Épisodes/Individu :</label>
-            <input type="number" id="episodesPerIndividual" value="50" step="10" min="1">
+                <label for="episodesPerIndividual">Épisodes/Individu :</label>
+                <input type="number" id="episodesPerIndividual" value="50" step="10" min="1">
 
-            <label for="mutationRate">Taux Mutation :</label>
-            <input type="number" id="mutationRate" value="0.05" step="0.01" min="0" max="1">
+                <label for="mutationRate">Taux Mutation :</label>
+                <input type="number" id="mutationRate" value="0.05" step="0.01" min="0" max="1">
 
-            <label for="learningRateActor">Acteur :</label>
-            <input type="number" id="learningRateActor" value="0.001" step="0.0001">
+                <label for="learningRateActor">Acteur :</label>
+                <input type="number" id="learningRateActor" value="0.001" step="0.0001">
 
-            <label for="learningRateCritic">Critique :</label>
-            <input type="number" id="learningRateCritic" value="0.005" step="0.0001">
+                <label for="learningRateCritic">Critique :</label>
+                <input type="number" id="learningRateCritic" value="0.005" step="0.0001">
 
-            <label for="gamma">Gamma :</label>
-            <input type="number" id="gamma" value="0.99" step="0.01">
+                <label for="gamma">Gamma :</label>
+                <input type="number" id="gamma" value="0.99" step="0.01">
 
-            <label for="numElitism">Nb Élitisme :</label>
-            <input type="number" id="numElitism" value="1" step="1" min="0">
+                <label for="numElitism">Nb Élitisme :</label>
+                <input type="number" id="numElitism" value="1" step="1" min="0">
 
-            <hr>
-            <h3>Paramètres de Récompense/Pénalité</h3>
-            <label for="collectionDistanceThreshold">Seuil Coll. Distance :</label>
-            <input type="number" id="collectionDistanceThreshold" value="10" step="1" min="0">
+                <hr>
+                <h3>Paramètres de Récompense/Pénalité</h3>
+                <label for="collectionDistanceThreshold">Seuil Coll. Distance :</label>
+                <input type="number" id="collectionDistanceThreshold" value="10" step="1" min="0">
 
-            <label for="stagnationPenalty">Pénalité Stagnation :</label>
-            <input type="number" id="stagnationPenalty" value="-0.2" step="0.05">
+                <label for="stagnationPenalty">Pénalité Stagnation :</label>
+                <input type="number" id="stagnationPenalty" value="-0.2" step="0.05">
 
-            <label for="stagnationThresholdSteps">Seuil Stagnation (pas) :</label>
-            <input type="number" id="stagnationThresholdSteps" value="30" step="5" min="1">
+                <label for="stagnationThresholdSteps">Seuil Stagnation (pas) :</label>
+                <input type="number" id="stagnationThresholdSteps" value="30" step="5" min="1">
 
-            <label for="actionChangePenalty">Pénalité Chgmt Action :</label>
-            <input type="number" id="actionChangePenalty" value="-0.02" step="0.01">
+                <label for="actionChangePenalty">Pénalité Chgmt Action :</label>
+                <input type="number" id="actionChangePenalty" value="-0.02" step="0.01">
+
+                <h3>Bonus / Récompenses supplémentaires</h3>
+
+                <label for="bonusProximity">Bonus Proximité :</label>
+                <input type="number" id="bonusProximity" value="0.2" step="0.01" min="0">
+
+                <label for="proximityThreshold">Seuil Proximité :</label>
+                <input type="number" id="proximityThreshold" value="120" step="5" min="10">
+
+                <label for="bonusActionVariation">Bonus Variation Actions :</label>
+                <input type="number" id="bonusActionVariation" value="0.005" step="0.001" min="0">
+
+                <label for="bonusNoWallHit">Bonus Épisode sans Mur :</label>
+                <input type="number" id="bonusNoWallHit" value="1" step="0.5" min="0">
+
+                <h3>Malus supplémentaires</h3>
+
+                <label for="penaltyPerStep">Pénalité Par Pas :</label>
+                <input type="number" id="penaltyPerStep" value="-0.01" step="0.005" max="0">
+
+                <label for="penaltyWallHit">Pénalité Mur (par pas) :</label>
+                <input type="number" id="penaltyWallHit" value="-0.5" step="0.1" max="0">
+
+                <label for="penaltyRepetitiveAction">Pénalité Répétition Actions :</label>
+                <input type="number" id="penaltyRepetitiveAction" value="-0.03" step="0.01" max="0">
+
+                <label for="penaltyEarlyEnd">Pénalité Épisode Vide Tôt :</label>
+                <input type="number" id="penaltyEarlyEnd" value="-5" step="0.5" max="0">
+
         </div>
 
         <script type="module">
@@ -621,12 +596,6 @@
                 const loadFileInput = document.getElementById('loadFileInput'); // Input de fichier caché
                 const resetButton = document.getElementById('resetButton');
                 const clearCacheButton = document.getElementById('clearCacheButton');
-
-                const infiniteGenerationsCheckbox = document.getElementById('infiniteGenerationsCheckbox');
-
-                // L'historique d'entraînement n'est plus nécessaire si le graphique est retiré,
-                // mais je le garde au cas où vous voudriez le réintroduire facilement ou pour d'autres usages.
-                let trainingHistory = [];
 
 
                 // --- Paramètres du Jeu (pour l'environnement d'évaluation) ---
@@ -709,27 +678,27 @@
                  * @returns {Promise<IDBDatabase>} La base de données IndexedDB.
                  */
                 function openDatabase() {
-                    return new Promise((resolve, reject) => {
-                        const request = indexedDB.open(DB_NAME, DB_VERSION);
+                        return new Promise((resolve, reject) => {
+                                const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-                        request.onupgradeneeded = (event) => {
-                            db = event.target.result;
-                            if (!db.objectStoreNames.contains(STORE_NAME)) {
-                                db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-                            }
-                        };
+                                request.onupgradeneeded = (event) => {
+                                        db = event.target.result;
+                                        if (!db.objectStoreNames.contains(STORE_NAME)) {
+                                                db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                                        }
+                                };
 
-                        request.onsuccess = (event) => {
-                            db = event.target.result;
-                            log("IndexedDB opened successfully.");
-                            resolve(db);
-                        };
+                                request.onsuccess = (event) => {
+                                        db = event.target.result;
+                                        log("IndexedDB opened successfully.");
+                                        resolve(db);
+                                };
 
-                        request.onerror = (event) => {
-                            console.error("IndexedDB error:", event.target.errorCode);
-                            reject(event.target.errorCode);
-                        };
-                    });
+                                request.onerror = (event) => {
+                                        console.error("IndexedDB error:", event.target.errorCode);
+                                        reject(event.target.errorCode);
+                                };
+                        });
                 }
 
                 /**
@@ -739,41 +708,39 @@
                  * @param {number} reward - Meilleure récompense globale.
                  * @param {number} circlesCollected - Nombre de ronds collectés pour la meilleure récompense.
                  * @param {number} currentGen - La génération actuelle.
-                 * @param {Array<object>} history - L'historique d'entraînement pour le graphique. // Supprimé
                  */
                 async function saveWeightsToIndexedDB(actorWeights, criticWeights, reward, circlesCollected, currentGen) {
-                    if (!db) {
-                        try {
-                            db = await openDatabase();
-                        } catch (error) {
-                            console.error("Failed to open IndexedDB for saving:", error);
-                            return;
+                        if (!db) {
+                                try {
+                                        db = await openDatabase();
+                                } catch (error) {
+                                        console.error("Failed to open IndexedDB for saving:", error);
+                                        return;
+                                }
                         }
-                    }
 
-                    const transaction = db.transaction([STORE_NAME], 'readwrite');
-                    const store = transaction.objectStore(STORE_NAME);
+                        const transaction = db.transaction([STORE_NAME], 'readwrite');
+                        const store = transaction.objectStore(STORE_NAME);
 
-                    const data = {
-                        id: 'bestAgent', // Clé unique pour stocker un seul meilleur agent
-                        actorWeights: actorWeights,
-                        criticWeights: criticWeights,
-                        bestReward: reward,
-                        bestCircles: circlesCollected,
-                        currentGeneration: currentGen,
-                        // trainingHistory: history, // Supprimé
-                        timestamp: new Date().toISOString()
-                    };
+                        const data = {
+                                id: 'bestAgent', // Clé unique pour stocker un seul meilleur agent
+                                actorWeights: actorWeights,
+                                criticWeights: criticWeights,
+                                bestReward: reward,
+                                bestCircles: circlesCollected,
+                                currentGeneration: currentGen, // Sauvegarde la génération actuelle // AJOUT
+                                timestamp: new Date().toISOString()
+                        };
 
-                    const request = store.put(data);
+                        const request = store.put(data);
 
-                    request.onsuccess = () => {
-                        log("Agent weights saved to IndexedDB.");
-                    };
+                        request.onsuccess = () => {
+                                log("Agent weights saved to IndexedDB.");
+                        };
 
-                    request.onerror = (event) => {
-                        console.error("Error saving to IndexedDB:", event.target.error);
-                    };
+                        request.onerror = (event) => {
+                                console.error("Error saving to IndexedDB:", event.target.error);
+                        };
                 }
 
                 /**
@@ -781,73 +748,72 @@
                  * @returns {Promise<object|null>} L'objet contenant les poids et autres données ou null si non trouvé.
                  */
                 async function loadWeightsFromIndexedDB() {
-                    if (!db) {
-                        try {
-                            db = await openDatabase();
-                        } catch (error) {
-                            console.error("Failed to open IndexedDB for loading:", error);
-                            return null;
+                        if (!db) {
+                                try {
+                                        db = await openDatabase();
+                                } catch (error) {
+                                        console.error("Failed to open IndexedDB for loading:", error);
+                                        return null;
+                                }
                         }
-                    }
 
-                    return new Promise((resolve) => {
-                        const transaction = db.transaction([STORE_NAME], 'readonly');
-                        const store = transaction.objectStore(STORE_NAME);
-                        const request = store.get('bestAgent');
+                        return new Promise((resolve) => {
+                                const transaction = db.transaction([STORE_NAME], 'readonly');
+                                const store = transaction.objectStore(STORE_NAME);
+                                const request = store.get('bestAgent');
 
-                        request.onsuccess = (event) => {
-                            const data = event.target.result;
-                            if (data) {
-                                log("Agent weights loaded from IndexedDB.");
-                                resolve({
-                                    actorWeights: data.actorWeights,
-                                    criticWeights: data.criticWeights,
-                                    bestReward: data.bestReward,
-                                    bestCircles: data.bestCircles,
-                                    currentGeneration: data.currentGeneration || 0, // Charge la génération, ou 0 par défaut
-                                    // trainingHistory: data.trainingHistory || [] // Supprimé
-                                });
-                            } else {
-                                log("No agent weights found in IndexedDB.");
-                                resolve(null);
-                            }
-                        };
+                                request.onsuccess = (event) => {
+                                        const data = event.target.result;
+                                        if (data) {
+                                                log("Agent weights loaded from IndexedDB.");
+                                                resolve({
+                                                        actorWeights: data.actorWeights,
+                                                        criticWeights: data.criticWeights,
+                                                        bestReward: data.bestReward,
+                                                        bestCircles: data.bestCircles,
+                                                        currentGeneration: data.currentGeneration || 0 // Charge la génération, ou 0 par défaut // AJOUT
+                                                });
+                                        } else {
+                                                log("No agent weights found in IndexedDB.");
+                                                resolve(null);
+                                        }
+                                };
 
-                        request.onerror = (event) => {
-                            console.error("Error loading from IndexedDB:", event.target.error);
-                            resolve(null);
-                        };
-                    });
+                                request.onerror = (event) => {
+                                        console.error("Error loading from IndexedDB:", event.target.error);
+                                        resolve(null);
+                                };
+                        });
                 }
 
                 /**
                  * Efface toutes les données de la base de données IndexedDB.
                  */
                 async function clearIndexedDB() {
-                    if (!db) {
-                        try {
-                            db = await openDatabase();
-                        } catch (error) {
-                            console.error("Failed to open IndexedDB for clearing:", error);
-                            return;
+                        if (!db) {
+                                try {
+                                        db = await openDatabase();
+                                } catch (error) {
+                                        console.error("Failed to open IndexedDB for clearing:", error);
+                                        return;
+                                }
                         }
-                    }
 
-                    return new Promise((resolve) => {
-                        const transaction = db.transaction([STORE_NAME], 'readwrite');
-                        const store = transaction.objectStore(STORE_NAME);
-                        const request = store.clear();
+                        return new Promise((resolve) => {
+                                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                                const store = transaction.objectStore(STORE_NAME);
+                                const request = store.clear();
 
-                        request.onsuccess = () => {
-                            log("IndexedDB cleared successfully.");
-                            resolve();
-                        };
+                                request.onsuccess = () => {
+                                        log("IndexedDB cleared successfully.");
+                                        resolve();
+                                };
 
-                        request.onerror = (event) => {
-                            console.error("Error clearing IndexedDB:", event.target.error);
-                            resolve(); // Resolve even on error to allow UI update
-                        };
-                    });
+                                request.onerror = (event) => {
+                                        console.error("Error clearing IndexedDB:", event.target.error);
+                                        resolve(); // Resolve even on error to allow UI update
+                                };
+                        });
                 }
 
 
@@ -862,12 +828,22 @@
 
                 // Fonction pour mettre à jour les paramètres de récompense/pénalité depuis l'UI
                 function updateRewardParameters() {
-                    COLLECTION_DISTANCE_THRESHOLD = parseFloat(collectionDistanceThresholdInput.value);
-                    PENALTY_STAGNATION = parseFloat(stagnationPenaltyInput.value);
-                    STAGNATION_THRESHOLD_STEPS = parseInt(stagnationThresholdStepsInput.value);
-                    PENALTY_ACTION_CHANGE = parseFloat(actionChangePenaltyInput.value);
-                    // Mettez à jour les autres si vous voulez les rendre configurables
-                    // REWARD_COLLECT_CIRCLE = parseFloat(someOtherInput.value);
+                        COLLECTION_DISTANCE_THRESHOLD = parseFloat(collectionDistanceThresholdInput.value);
+                        PENALTY_STAGNATION = parseFloat(stagnationPenaltyInput.value);
+                        STAGNATION_THRESHOLD_STEPS = parseInt(stagnationThresholdStepsInput.value);
+                        PENALTY_ACTION_CHANGE = parseFloat(actionChangePenaltyInput.value);
+                        BONUS_PROXIMITY = parseFloat(document.getElementById('bonusProximity').value);
+                        PROXIMITY_THRESHOLD = parseFloat(document.getElementById('proximityThreshold').value);
+                        BONUS_ACTION_VARIATION_PER_STEP = parseFloat(document.getElementById('bonusActionVariation').value);
+                        BONUS_NO_WALL_HIT_EPISODE = parseFloat(document.getElementById('bonusNoWallHit').value);
+
+                        PENALTY_PER_STEP = parseFloat(document.getElementById('penaltyPerStep').value);
+                        PENALTY_WALL_HIT_PER_STEP = parseFloat(document.getElementById('penaltyWallHit').value);
+                        PENALTY_REPETITIVE_ACTION = parseFloat(document.getElementById('penaltyRepetitiveAction').value);
+                        PENALTY_EARLY_EMPTY_EPISODE = parseFloat(document.getElementById('penaltyEarlyEnd').value);
+
+                        // Mettez à jour les autres si vous voulez les rendre configurables
+                        // REWARD_COLLECT_CIRCLE = parseFloat(someOtherInput.value);
                 }
 
 
@@ -948,123 +924,123 @@
                 /**
                  * Effectue un pas dans l'environnement, met à jour la position du carré,
                  * vérifie les collisions et calcule la récompense pour ce pas.
-                 * @param {number} actionIndex - L'action choisie par l'agent (0:Haut, 1:Bas, 2:Gauche, 3:Droite, 4:Haut-Gauche, 5:Haut-Droite, 6:Bas-Gauche, 7:Bas-Droite).
+                 * @param {number} actionIndex - L'action choisie par l'agent (0:Haut, 1:Bas, 2:Gauche, 3:Droite, 4:Haut-Gauche, 5:Haut-Droite, 6:Bas-Gauche, 7:Bas-Droite). // AJOUT
                  * @param {number} timeStep - Le numéro du pas de temps actuel dans l'épisode.
                  * @returns {object} Un objet contenant la récompense pour ce pas et le nombre de ronds collectés.
                  */
                 function stepEnvironmentAndGetReward(actionIndex, timeStep) {
-                    let currentReward = PENALTY_PER_STEP;
-                    let collectedCount = 0;
+                        let currentReward = PENALTY_PER_STEP;
+                        let collectedCount = 0;
 
-                    const { minDistance: currentDistanceToClosest, closestCircle } = getCurrentState();
-                    if (previousDistanceToClosestCircle === undefined) {
-                        previousDistanceToClosestCircle = currentDistanceToClosest;
-                    }
-
-                    // Malus d'oscillation (Malus Supplémentaire)
-                    if (lastActionIndex !== -1 && actionIndex !== lastActionIndex) {
-                        currentReward += PENALTY_ACTION_CHANGE;
-                    }
-
-                    let nextSquareX = squareX;
-                    let nextSquareY = squareY;
-
-                    // Logique de déplacement pour 8 directions
-                    switch (actionIndex) {
-                        case 0: nextSquareY -= SQUARE_SPEED; break; // Haut
-                        case 1: nextSquareY += SQUARE_SPEED; break; // Bas
-                        case 2: nextSquareX -= SQUARE_SPEED; break; // Gauche
-                        case 3: nextSquareX += SQUARE_SPEED; break; // Droite
-                        case 4: nextSquareY -= SQUARE_SPEED; nextSquareX -= SQUARE_SPEED; break; // Haut-Gauche
-                        case 5: nextSquareY -= SQUARE_SPEED; nextSquareX += SQUARE_SPEED; break; // Haut-Droite
-                        case 6: nextSquareY += SQUARE_SPEED; nextSquareX -= SQUARE_SPEED; break; // Bas-Gauche
-                        case 7: nextSquareY += SQUARE_SPEED; nextSquareX += SQUARE_SPEED; break; // Bas-Droite
-                    }
-
-                    const willHitWall = (nextSquareX < 0 || nextSquareX > canvas.width - SQUARE_SIZE ||
-                                         nextSquareY < 0 || nextSquareY > canvas.height - SQUARE_SIZE);
-                    if (willHitWall) {
-                        currentReward += PENALTY_WALL_HIT_PER_STEP;
-                        episodeWallHit = true;
-                    }
-
-                    squareX = Math.max(0, Math.min(canvas.width - SQUARE_SIZE, nextSquareX));
-                    squareY = Math.max(0, Math.min(canvas.height - SQUARE_SIZE, nextSquareY));
-
-                    // Détection d'inactivité (Malus 3)
-                    if (squareX === lastSquareX && squareY === lastSquareY) {
-                        inactivitySteps++;
-                    } else {
-                        inactivitySteps = 0;
-                    }
-                    lastSquareX = squareX;
-                    lastSquareY = squareY;
-
-                    // Malus de stagnation (Nouveau Malus)
-                    // Si immobile ET proche d'un cercle sans le ramasser, incrémente le compteur de stagnation
-                    if (inactivitySteps > 0 && currentDistanceToClosest > (CIRCLE_RADIUS + SQUARE_SIZE / 2) && currentDistanceToClosest < PROXIMITY_THRESHOLD) {
-                        stagnationTrackingSteps++;
-                        if (stagnationTrackingSteps >= STAGNATION_THRESHOLD_STEPS) {
-                            currentReward += PENALTY_STAGNATION;
+                        const { minDistance: currentDistanceToClosest, closestCircle } = getCurrentState();
+                        if (previousDistanceToClosestCircle === undefined) {
+                                previousDistanceToClosestCircle = currentDistanceToClosest;
                         }
-                    } else {
-                        stagnationTrackingSteps = 0; // Réinitialise si bouge ou ramasse ou s'éloigne
-                    }
 
-
-                    // Détection d'actions répétitives (Malus 4) - seulement si pas de ronds ramassés
-                    // Le check `collectedCount === 0` est fait APRÈS la collecte pour être précis
-                    const previousCollectedCount = collectedCount; // Sauvegarde l'état de collecte avant le check
-                    if (actionIndex === lastActionIndex && previousCollectedCount === 0) {
-                        repetitiveActionSteps++;
-                        if (repetitiveActionSteps >= REPETITIVE_ACTION_THRESHOLD_STEPS) {
-                            currentReward += PENALTY_REPETITIVE_ACTION;
+                        // Malus d'oscillation (Malus Supplémentaire)
+                        if (lastActionIndex !== -1 && actionIndex !== lastActionIndex) {
+                                currentReward += PENALTY_ACTION_CHANGE;
                         }
-                    } else {
-                        repetitiveActionSteps = 0;
-                    }
-                    lastActionIndex = actionIndex; // Met à jour pour le prochain pas
 
-                    // Mettre à jour l'historique des actions (Bonus 3: Variation d'actions)
-                    actionHistoryBuffer.push(actionIndex);
-                    if (actionHistoryBuffer.length > ACTION_HISTORY_BUFFER_SIZE) {
-                        actionHistoryBuffer.shift();
-                    }
-                    const uniqueActions = new Set(actionHistoryBuffer).size;
-                    if (uniqueActions >= MIN_UNIQUE_ACTIONS_FOR_BONUS) {
-                        currentReward += BONUS_ACTION_VARIATION_PER_STEP;
-                    }
+                        let nextSquareX = squareX;
+                        let nextSquareY = squareY;
 
-                    // Vérifie les collisions avec les cercles (Bonus 1 + Détection par distance)
-                    for (let i = circles.length - 1; i >= 0; i--) {
-                        const circle = circles[i];
-                        const dx = (squareX + SQUARE_SIZE / 2) - circle.x;
-                        const dy = (squareY + SQUARE_SIZE / 2) - circle.y;
-                        const distance = Math.sqrt(dx * dx + dy * dy);
-
-                        // Collection par distance (Nouveau comportement)
-                        if (distance < (CIRCLE_RADIUS + SQUARE_SIZE / 2 + COLLECTION_DISTANCE_THRESHOLD)) {
-                            circles.splice(i, 1);
-                            currentReward += REWARD_COLLECT_CIRCLE;
-                            collectedCount++;
-
-                            // Bonus 2: Rapidité de collecte après le début de l'épisode
-                            currentReward += Math.max(0, BONUS_QUICK_COLLECTION_BASE - (timeStep * BONUS_QUICK_COLLECTION_DECAY));
-
-                            if (circles.length < MAX_CIRCLES) {
-                                generateCircle();
-                            }
+                        // AJOUT: Logique de déplacement pour 8 directions
+                        switch (actionIndex) {
+                                case 0: nextSquareY -= SQUARE_SPEED; break; // Haut
+                                case 1: nextSquareY += SQUARE_SPEED; break; // Bas
+                                case 2: nextSquareX -= SQUARE_SPEED; break; // Gauche
+                                case 3: nextSquareX += SQUARE_SPEED; break; // Droite
+                                case 4: nextSquareY -= SQUARE_SPEED; nextSquareX -= SQUARE_SPEED; break; // Haut-Gauche
+                                case 5: nextSquareY -= SQUARE_SPEED; nextSquareX += SQUARE_SPEED; break; // Haut-Droite
+                                case 6: nextSquareY += SQUARE_SPEED; nextSquareX -= SQUARE_SPEED; break; // Bas-Gauche
+                                case 7: nextSquareY += SQUARE_SPEED; nextSquareX += SQUARE_SPEED; break; // Bas-Droite
                         }
-                    }
 
-                    // Bonus 4: Se rapprocher d'un objet
-                    const { minDistance: newDistanceToClosest } = getCurrentState();
-                    if (newDistanceToClosest < previousDistanceToClosestCircle && newDistanceToClosest > 0 && newDistanceToClosest < PROXIMITY_THRESHOLD) {
-                        currentReward += BONUS_PROXIMITY;
-                    }
-                    previousDistanceToClosestCircle = newDistanceToClosest;
+                        const willHitWall = (nextSquareX < 0 || nextSquareX > canvas.width - SQUARE_SIZE ||
+                                nextSquareY < 0 || nextSquareY > canvas.height - SQUARE_SIZE);
+                        if (willHitWall) {
+                                currentReward += PENALTY_WALL_HIT_PER_STEP;
+                                episodeWallHit = true;
+                        }
 
-                    return { reward: currentReward, collectedCount: collectedCount };
+                        squareX = Math.max(0, Math.min(canvas.width - SQUARE_SIZE, nextSquareX));
+                        squareY = Math.max(0, Math.min(canvas.height - SQUARE_SIZE, nextSquareY));
+
+                        // Détection d'inactivité (Malus 3)
+                        if (squareX === lastSquareX && squareY === lastSquareY) {
+                                inactivitySteps++;
+                        } else {
+                                inactivitySteps = 0;
+                        }
+                        lastSquareX = squareX;
+                        lastSquareY = squareY;
+
+                        // Malus de stagnation (Nouveau Malus)
+                        // Si immobile ET proche d'un cercle sans le ramasser, incrémente le compteur de stagnation
+                        if (inactivitySteps > 0 && currentDistanceToClosest > (CIRCLE_RADIUS + SQUARE_SIZE / 2) && currentDistanceToClosest < PROXIMITY_THRESHOLD) {
+                                stagnationTrackingSteps++;
+                                if (stagnationTrackingSteps >= STAGNATION_THRESHOLD_STEPS) {
+                                        currentReward += PENALTY_STAGNATION;
+                                }
+                        } else {
+                                stagnationTrackingSteps = 0; // Réinitialise si bouge ou ramasse ou s'éloigne
+                        }
+
+
+                        // Détection d'actions répétitives (Malus 4) - seulement si pas de ronds ramassés
+                        // Le check `collectedCount === 0` est fait APRÈS la collecte pour être précis
+                        const previousCollectedCount = collectedCount; // Sauvegarde l'état de collecte avant le check
+                        if (actionIndex === lastActionIndex && previousCollectedCount === 0) {
+                                repetitiveActionSteps++;
+                                if (repetitiveActionSteps >= REPETITIVE_ACTION_THRESHOLD_STEPS) {
+                                        currentReward += PENALTY_REPETITIVE_ACTION;
+                                }
+                        } else {
+                                repetitiveActionSteps = 0;
+                        }
+                        lastActionIndex = actionIndex; // Met à jour pour le prochain pas
+
+                        // Mettre à jour l'historique des actions (Bonus 3: Variation d'actions)
+                        actionHistoryBuffer.push(actionIndex);
+                        if (actionHistoryBuffer.length > ACTION_HISTORY_BUFFER_SIZE) {
+                                actionHistoryBuffer.shift();
+                        }
+                        const uniqueActions = new Set(actionHistoryBuffer).size;
+                        if (uniqueActions >= MIN_UNIQUE_ACTIONS_FOR_BONUS) {
+                                currentReward += BONUS_ACTION_VARIATION_PER_STEP;
+                        }
+
+                        // Vérifie les collisions avec les cercles (Bonus 1 + Détection par distance)
+                        for (let i = circles.length - 1; i >= 0; i--) {
+                                const circle = circles[i];
+                                const dx = (squareX + SQUARE_SIZE / 2) - circle.x;
+                                const dy = (squareY + SQUARE_SIZE / 2) - circle.y;
+                                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                                // Collection par distance (Nouveau comportement)
+                                if (distance < (CIRCLE_RADIUS + SQUARE_SIZE / 2 + COLLECTION_DISTANCE_THRESHOLD)) {
+                                        circles.splice(i, 1);
+                                        currentReward += REWARD_COLLECT_CIRCLE;
+                                        collectedCount++;
+
+                                        // Bonus 2: Rapidité de collecte après le début de l'épisode
+                                        currentReward += Math.max(0, BONUS_QUICK_COLLECTION_BASE - (timeStep * BONUS_QUICK_COLLECTION_DECAY));
+
+                                        if (circles.length < MAX_CIRCLES) {
+                                                generateCircle();
+                                        }
+                                }
+                        }
+
+                        // Bonus 4: Se rapprocher d'un objet
+                        const { minDistance: newDistanceToClosest } = getCurrentState();
+                        if (newDistanceToClosest < previousDistanceToClosestCircle && newDistanceToClosest > 0 && newDistanceToClosest < PROXIMITY_THRESHOLD) {
+                                currentReward += BONUS_PROXIMITY;
+                        }
+                        previousDistanceToClosestCircle = newDistanceToClosest;
+
+                        return { reward: currentReward, collectedCount: collectedCount };
                 }
 
 
@@ -1083,8 +1059,8 @@
 
                         for (let i = 0; i < numEpisodes; i++) {
                                 if (!isTraining) {
-                                    log("evaluateIndividual: Entraînement interrompu (début épisode).");
-                                    return { totalReward, totalCirclesCollected };
+                                        log("evaluateIndividual: Entraînement interrompu (début épisode).");
+                                        return { totalReward, totalCirclesCollected };
                                 }
 
                                 resetGameEnvironment();
@@ -1095,8 +1071,8 @@
 
                                 while (timeStep < MAX_TIME_STEPS_PER_EPISODE) {
                                         if (!isTraining) {
-                                            log("evaluateIndividual: Entraînement interrompu (dans boucle pas de temps).");
-                                            break;
+                                                log("evaluateIndividual: Entraînement interrompu (dans boucle pas de temps).");
+                                                break;
                                         }
 
                                         timeStep++;
@@ -1115,8 +1091,8 @@
                                         }
 
                                         if (circles.length === 0 || timeStep >= MAX_TIME_STEPS_PER_EPISODE) {
-                                            episodeTerminatedEarlyWithoutCollection = (episodeCirclesCollected === 0 && timeStep < EARLY_END_TIME_THRESHOLD);
-                                            break;
+                                                episodeTerminatedEarlyWithoutCollection = (episodeCirclesCollected === 0 && timeStep < EARLY_END_TIME_THRESHOLD);
+                                                break;
                                         }
                                 }
                                 totalReward += episodeReward;
@@ -1124,12 +1100,12 @@
 
                                 // Bonus 5: Si l'agent n'a pas heurté de mur pendant tout l'épisode
                                 if (!episodeWallHit) {
-                                    totalReward += BONUS_NO_WALL_HIT_EPISODE;
+                                        totalReward += BONUS_NO_WALL_HIT_EPISODE;
                                 }
 
                                 // Malus 5: Si l'épisode se termine trop vite sans rien ramasser
                                 if (episodeTerminatedEarlyWithoutCollection) {
-                                    totalReward += PENALTY_EARLY_EMPTY_EPISODE;
+                                        totalReward += PENALTY_EARLY_EMPTY_EPISODE;
                                 }
                         }
                         return { totalReward, totalCirclesCollected };
@@ -1182,170 +1158,161 @@
                         stopTestButtonVisual.disabled = true;
 
                         const numIndividuals = parseInt(numIndividualsInput.value);
-                        const totalGenerationsToRun = parseInt(numGenerationsInput.value);
+                        const numGenerations = parseInt(numGenerationsInput.value);
                         const episodesPerIndividual = parseInt(episodesPerIndividualInput.value);
                         const mutationRate = parseFloat(mutationRateInput.value);
                         const learningRateActor = parseFloat(learningRateActorInput.value);
-                        // Correction: Utilise parseFloat directement pour éviter les problèmes de précision
                         const learningRateCritic = parseFloat(learningRateCriticInput.value);
                         const gamma = parseFloat(gammaInput.value);
                         const numElitism = parseInt(numElitismInput.value);
-                        const isInfiniteGenerations = infiniteGenerationsCheckbox.checked;
 
                         // Mettre à jour les paramètres de récompense/pénalité au début de chaque run d'entraînement
                         updateRewardParameters();
 
                         let population = [];
-                        const NUM_ACTIONS = 8;
+                        const NUM_ACTIONS = 8; // AJOUT: Le nombre total d'actions
 
                         if (initialBestAgent && initialBestAgent.getActorWeights() && initialBestAgent.getCriticWeights()) {
-                            // Si un meilleur agent initial est fourni, l'utiliser comme le premier individu
-                            population.push(initialBestAgent);
-                            log("Population initialisée avec le meilleur agent chargé comme premier individu.");
-                            // Remplir le reste de la population avec des mutations de cet agent
-                            for (let i = 1; i < numIndividuals; i++) {
-                                let newActorWeights = JSON.parse(JSON.stringify(initialBestAgent.getActorWeights()));
-                                let newCriticWeights = JSON.parse(JSON.stringify(initialBestAgent.getCriticWeights()));
-                                newActorWeights = mutate(newActorWeights, mutationRate);
-                                newCriticWeights = mutate(newCriticWeights, mutationRate);
-                                population.push(new ActorCritic(
-                                    learningRateActor, learningRateCritic, gamma,
-                                    getCurrentState().stateFeatures.length, NUM_ACTIONS,
-                                    newActorWeights, newCriticWeights
-                                ));
-                            }
+                                // Si un meilleur agent initial est fourni, l'utiliser comme le premier individu
+                                population.push(initialBestAgent);
+                                log("Population initialisée avec le meilleur agent chargé comme premier individu.");
+                                // Remplir le reste de la population avec des mutations de cet agent
+                                for (let i = 1; i < numIndividuals; i++) {
+                                        let newActorWeights = JSON.parse(JSON.stringify(initialBestAgent.getActorWeights()));
+                                        let newCriticWeights = JSON.parse(JSON.stringify(initialBestAgent.getCriticWeights()));
+                                        newActorWeights = mutate(newActorWeights, mutationRate);
+                                        newCriticWeights = mutate(newCriticWeights, mutationRate);
+                                        population.push(new ActorCritic(
+                                                learningRateActor, learningRateCritic, gamma,
+                                                getCurrentState().stateFeatures.length, NUM_ACTIONS, // AJOUT: Utilisation de NUM_ACTIONS
+                                                newActorWeights, newCriticWeights
+                                        ));
+                                }
                         } else {
-                            // Sinon, initialiser avec des agents aléatoires
-                            log("Population initialisée avec des agents aléatoires.");
-                            for (let i = 0; i < numIndividuals; i++) {
-                                population.push(new ActorCritic(
-                                        learningRateActor,
-                                        learningRateCritic,
-                                        gamma,
-                                        getCurrentState().stateFeatures.length,
-                                        NUM_ACTIONS
-                                ));
-                            }
+                                // Sinon, initialiser avec des agents aléatoires
+                                log("Population initialisée avec des agents aléatoires.");
+                                for (let i = 0; i < numIndividuals; i++) {
+                                        population.push(new ActorCritic(
+                                                learningRateActor,
+                                                learningRateCritic,
+                                                gamma,
+                                                getCurrentState().stateFeatures.length,
+                                                NUM_ACTIONS // AJOUT: Utilisation de NUM_ACTIONS
+                                        ));
+                                }
                         }
 
-                        const startingGenerationForThisRun = currentGeneration;
+                        // Définir la génération de départ pour cette exécution d'entraînement
+                        const startGeneration = currentGeneration; // Utilisez la génération globale actuelle
 
-                        while (isTraining) {
-                            // Nouvelle condition pour les générations infinies
-                            if (!isInfiniteGenerations && (currentGeneration - startingGenerationForThisRun) >= totalGenerationsToRun) {
-                                log("runGenerations: Nombre de générations spécifié atteint.");
-                                break;
-                            }
-
-                            currentGeneration++; // Increment global generation counter for the new generation
-                            currentGenerationSpan.textContent = currentGeneration;
-                            log(`--- Génération ${currentGeneration} ---`);
-
-                            let individualsWithFitness = [];
-
-                            for (let i = 0; i < numIndividuals; i++) {
-                                const agent = population[i];
-
-                                const { totalReward: fitness, totalCirclesCollected: circlesCollectedByIndividual } = await evaluateIndividual(agent, episodesPerIndividual, true);
-
+                        for (let gen = startGeneration; gen < startGeneration + numGenerations; gen++) {
                                 if (!isTraining) {
-                                    log("runGenerations: Sortie de l'évaluation individuelle car l'entraînement a été arrêté.");
-                                    break;
-                                }
-
-                                individualsWithFitness.push({ agent, fitness, circlesCollectedByIndividual });
-
-                                if (i % Math.max(1, Math.floor(numIndividuals / 5)) === 0) {
-                                        log(`  Individu ${i + 1}/${numIndividuals}: Fitness = ${fitness.toFixed(2)} (Ronds: ${circlesCollectedByIndividual})`);
-                                }
-                            }
-
-                            if (!isTraining) break;
-
-                            individualsWithFitness.sort((a, b) => b.fitness - a.fitness);
-
-                            const bestFitnessThisGen = individualsWithFitness[0].fitness;
-                            const bestCirclesThisGen = individualsWithFitness[0].circlesCollectedByIndividual;
-
-                            log(`Meilleure fitness de la génération ${currentGeneration}: ${bestFitnessThisGen.toFixed(2)} (Ronds: ${bestCirclesThisGen})`);
-
-                            // L'historique n'est plus utilisé pour le graphique, mais on peut le garder pour d'autres raisons
-                            // trainingHistory.push({
-                            //     generation: currentGeneration,
-                            //     bestFitness: bestFitnessThisGen,
-                            //     averageFitness: individualsWithFitness.reduce((sum, ind) => sum + ind.fitness, 0) / numIndividuals
-                            // });
-                            // updateLearningCurveChart(); // Appel supprimé
-
-                            if (bestFitnessThisGen > bestRewardAllTime) {
-                                bestRewardAllTime = bestFitnessThisGen;
-                                bestCirclesAllTime = bestCirclesThisGen;
-                                bestRewardAllTimeSpan.textContent = bestRewardAllTime.toFixed(2);
-                                bestCirclesAllTimeSpan.textContent = bestCirclesAllTime;
-                                // Ajoute la classe pour la couleur verte
-                                bestRewardAllTimeSpan.classList.add('record-achieved-color');
-                                bestCirclesAllTimeSpan.classList.add('record-achieved-color');
-                                log(`Nouveau meilleur score global de la session ! Récompense : ${bestRewardAllTime.toFixed(2)} (${bestCirclesAllTime} ronds)`);
-
-                                bestActorWeights = individualsWithFitness[0].agent.getActorWeights();
-                                bestCriticWeights = individualsWithFitness[0].agent.getCriticWeights();
-
-                                bestAgentInstance = new ActorCritic(
-                                        learningRateActor, learningRateCritic, gamma,
-                                        getCurrentState().stateFeatures.length, NUM_ACTIONS,
-                                        bestActorWeights, bestCriticWeights
-                                );
-                                log("Meilleure IA mise à jour, prête pour le test visuel.");
-
-                                // Sauvegarde automatique dans IndexedDB, sans l'historique
-                                saveWeightsToIndexedDB(bestActorWeights, bestCriticWeights, bestRewardAllTime, bestCirclesAllTime, currentGeneration);
-                            }
-
-
-                            const nextPopulation = [];
-
-                            for (let i = 0; i < Math.min(numElitism, numIndividuals); i++) {
-                                nextPopulation.push(individualsWithFitness[i].agent);
-                            }
-
-
-                            const numParents = Math.ceil(numIndividuals * 0.5);
-                            const selectedParents = individualsWithFitness.slice(0, numParents);
-
-                            while (nextPopulation.length < numIndividuals) {
-                                    if (!isTraining) {
-                                        log("runGenerations: Arrêt de la création de la nouvelle population (entraînement interrompu).");
+                                        log(`runGenerations: Entraînement interrompu après ${currentGeneration} générations.`);
                                         break;
-                                    }
+                                }
+                                currentGeneration = gen + 1; // Met à jour la variable globale de la génération actuelle
+                                currentGenerationSpan.textContent = currentGeneration;
+                                log(`--- Génération ${currentGeneration} ---`);
 
-                                    const parent1 = selectedParents[getRandomInt(0, selectedParents.length - 1)].agent;
-                                    const parent2 = selectedParents[getRandomInt(0, selectedParents.length - 1)].agent;
+                                let individualsWithFitness = [];
 
+                                for (let i = 0; i < numIndividuals; i++) {
+                                        const agent = population[i];
 
-                                    const parent1ActorWeights = parent1.getActorWeights();
-                                    const parent1CriticWeights = parent1.getCriticWeights();
-                                    const parent2ActorWeights = parent2.getActorWeights();
-                                    const parent2CriticWeights = parent2.getCriticWeights();
-
-
-                                    let childActorWeights = crossover(parent1ActorWeights, parent2ActorWeights);
-                                    let childCriticWeights = crossover(parent1CriticWeights, parent2CriticWeights);
+                                        const { totalReward: fitness, totalCirclesCollected: circlesCollectedByIndividual } = await evaluateIndividual(agent, episodesPerIndividual, true);
 
 
-                                    childActorWeights = mutate(childActorWeights, mutationRate);
-                                    childCriticWeights = mutate(childCriticWeights, mutationRate);
+                                        if (!isTraining) {
+                                                log("runGenerations: Sortie de l'évaluation individuelle car l'entraînement a été arrêté.");
+                                                break;
+                                        }
+
+                                        individualsWithFitness.push({ agent, fitness, circlesCollectedByIndividual });
 
 
-                                    nextPopulation.push(new ActorCritic(
-                                            learningRateActor, learningRateCritic, gamma,
-                                            getCurrentState().stateFeatures.length, NUM_ACTIONS,
-                                            childActorWeights, childCriticWeights
-                                    ));
-                            }
-                            population = nextPopulation;
+                                        if (i % Math.max(1, Math.floor(numIndividuals / 5)) === 0) {
+                                                log(`  Individu ${i + 1}/${numIndividuals}: Fitness = ${fitness.toFixed(2)} (Ronds: ${circlesCollectedByIndividual})`);
+                                        }
+                                }
+
+                                if (!isTraining) break;
 
 
-                            await new Promise(resolve => setTimeout(resolve, 0));
+                                individualsWithFitness.sort((a, b) => b.fitness - a.fitness);
+
+                                const bestFitnessThisGen = individualsWithFitness[0].fitness;
+                                const bestCirclesThisGen = individualsWithFitness[0].circlesCollectedByIndividual;
+
+                                log(`Meilleure fitness de la génération ${currentGeneration}: ${bestFitnessThisGen.toFixed(2)} (Ronds: ${bestCirclesThisGen})`);
+
+
+                                if (bestFitnessThisGen > bestRewardAllTime) {
+                                        bestRewardAllTime = bestFitnessThisGen;
+                                        bestCirclesAllTime = bestCirclesThisGen;
+                                        bestRewardAllTimeSpan.textContent = bestRewardAllTime.toFixed(2);
+                                        bestCirclesAllTimeSpan.textContent = bestCirclesAllTime;
+                                        log(`Nouveau meilleur score global de la session ! Récompense : ${bestRewardAllTime.toFixed(2)} (${bestCirclesAllTime} ronds)`);
+
+
+                                        bestActorWeights = individualsWithFitness[0].agent.getActorWeights();
+                                        bestCriticWeights = individualsWithFitness[0].agent.getCriticWeights();
+
+                                        bestAgentInstance = new ActorCritic(
+                                                learningRateActor, learningRateCritic, gamma,
+                                                getCurrentState().stateFeatures.length, NUM_ACTIONS, // AJOUT: Utilisation de NUM_ACTIONS
+                                                bestActorWeights, bestCriticWeights
+                                        );
+                                        log("Meilleure IA mise à jour, prête pour le test visuel.");
+
+                                        // Sauvegarde automatique dans IndexedDB, y compris la génération actuelle
+                                        saveWeightsToIndexedDB(bestActorWeights, bestCriticWeights, bestRewardAllTime, bestCirclesAllTime, currentGeneration);
+                                }
+
+
+                                const nextPopulation = [];
+
+                                for (let i = 0; i < Math.min(numElitism, numIndividuals); i++) {
+                                        nextPopulation.push(individualsWithFitness[i].agent);
+                                }
+
+
+                                const numParents = Math.ceil(numIndividuals * 0.5);
+                                const selectedParents = individualsWithFitness.slice(0, numParents);
+
+                                while (nextPopulation.length < numIndividuals) {
+                                        if (!isTraining) {
+                                                log("runGenerations: Arrêt de la création de la nouvelle population (entraînement interrompu).");
+                                                break;
+                                        }
+
+                                        const parent1 = selectedParents[getRandomInt(0, selectedParents.length - 1)].agent;
+                                        const parent2 = selectedParents[getRandomInt(0, selectedParents.length - 1)].agent;
+
+
+                                        const parent1ActorWeights = parent1.getActorWeights();
+                                        const parent1CriticWeights = parent1.getCriticWeights();
+                                        const parent2ActorWeights = parent2.getActorWeights();
+                                        const parent2CriticWeights = parent2.getCriticWeights();
+
+
+                                        let childActorWeights = crossover(parent1ActorWeights, parent2ActorWeights);
+                                        let childCriticWeights = crossover(parent1CriticWeights, parent2CriticWeights);
+
+
+                                        childActorWeights = mutate(childActorWeights, mutationRate);
+                                        childCriticWeights = mutate(childCriticWeights, mutationRate);
+
+
+                                        nextPopulation.push(new ActorCritic(
+                                                learningRateActor, learningRateCritic, gamma,
+                                                getCurrentState().stateFeatures.length, NUM_ACTIONS, // AJOUT: Utilisation de NUM_ACTIONS
+                                                childActorWeights, childCriticWeights
+                                        ));
+                                }
+                                population = nextPopulation;
+
+
+                                await new Promise(resolve => setTimeout(resolve, 0));
                         }
 
                         log(`runGenerations: Entraînement génétique terminé après ${currentGeneration} générations.`);
@@ -1354,7 +1321,7 @@
                         if (bestAgentInstance) {
                                 testBestIAButton.disabled = false;
                         }
-                    }
+                }
 
                 // --- Fonctions de dessin du jeu ---
                 function drawGame() {
@@ -1441,10 +1408,6 @@
                         log("Test visuel arrêté.");
                 }
 
-                // Fonctions Chart.js et trainingHistory supprimées
-                // function initializeLearningCurveChart() { ... }
-                // function updateLearningCurveChart() { ... }
-
 
                 // --- Gestion des événements UI ---
 
@@ -1457,12 +1420,12 @@
 
 
                                 if (isTestingVisual) {
-                                    cancelAnimationFrame(animationFrameId);
-                                    animationFrameId = null;
-                                    isTestingVisual = false;
-                                    currentTestScoreSpan.textContent = '0';
-                                    circlesCollectedTestSpan.textContent = '0';
-                                    log("Test visuel interrompu au démarrage de l'entraînement génétique.");
+                                        cancelAnimationFrame(animationFrameId);
+                                        animationFrameId = null;
+                                        isTestingVisual = false;
+                                        currentTestScoreSpan.textContent = '0';
+                                        circlesCollectedTestSpan.textContent = '0';
+                                        log("Test visuel interrompu au démarrage de l'entraînement génétique.");
                                 }
 
                                 testBestIAButton.disabled = true;
@@ -1471,23 +1434,15 @@
                                 currentTestScoreSpan.textContent = '0';
                                 circlesCollectedTestSpan.textContent = '0';
 
-                                // Réinitialise la couleur des scores au début d'un nouvel entraînement
-                                bestRewardAllTimeSpan.classList.remove('record-achieved-color');
-                                bestCirclesAllTimeSpan.classList.remove('record-achieved-color');
-
-                                // L'historique n'est plus géré par le graphique
-                                trainingHistory = [];
-                                // updateLearningCurveChart(); // Appel supprimé
-
                                 await new Promise(resolve => setTimeout(resolve, 50));
                                 // Passe l'instance du meilleur agent actuellement en mémoire (chargée ou de la dernière session)
                                 await runGenerations(bestAgentInstance);
-                            }
+                        }
                 });
 
                 stopButton.addEventListener('click', () => {
                         stopTraining(true);
-                    });
+                });
 
                 function stopTraining(fromUser = false) {
                         isTraining = false;
@@ -1507,231 +1462,194 @@
                 stopTestButtonVisual.addEventListener('click', stopVisualTest);
 
                 settingsButton.addEventListener('click', () => {
-                    settingsPanel.classList.toggle('open');
-                });
-
-                // Listener pour la checkbox des générations infinies
-                infiniteGenerationsCheckbox.addEventListener('change', () => {
-                    numGenerationsInput.disabled = infiniteGenerationsCheckbox.checked;
+                        settingsPanel.classList.toggle('open');
                 });
 
                 // --- Fonctions de sauvegarde/chargement via fichier ---
 
                 saveButton.addEventListener('click', () => {
-                    if (bestActorWeights && bestCriticWeights) {
-                        const dataToSave = {
-                            actorWeights: bestActorWeights,
-                            criticWeights: bestCriticWeights,
-                            bestReward: bestRewardAllTime,
-                            bestCircles: bestCirclesAllTime,
-                            currentGeneration: currentGeneration, // Sauvegarde la génération actuelle
-                            numIndividuals: parseInt(numIndividualsInput.value),
-                            numGenerations: parseInt(numGenerationsInput.value),
-                            episodesPerIndividual: parseInt(episodesPerIndividualInput.value),
-                            mutationRate: parseFloat(mutationRateInput.value),
-                            learningRateActor: parseFloat(learningRateActorInput.value),
-                            learningRateCritic: parseFloat(learningRateCriticInput.value),
-                            gamma: parseFloat(gammaInput.value),
-                            numElitism: parseInt(numElitismInput.value),
-                            collectionDistanceThreshold: parseFloat(collectionDistanceThresholdInput.value),
-                            stagnationPenalty: parseFloat(stagnationPenaltyInput.value),
-                            stagnationThresholdSteps: parseInt(stagnationThresholdStepsInput.value),
-                            actionChangePenalty: parseFloat(actionChangePenaltyInput.value),
-                            // trainingHistory: trainingHistory, // Supprimé
-                            timestamp: new Date().toISOString()
-                        };
-                        const jsonString = JSON.stringify(dataToSave, null, 2);
-                        const blob = new Blob([jsonString], { type: 'application/json' });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `actor_critic_agent_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                        log("Agent configuration saved to JSON file.");
-                    } else {
-                        log("No trained agent to save. Please run training first.");
-                    }
+                        if (bestActorWeights && bestCriticWeights) {
+                                const dataToSave = {
+                                        actorWeights: bestActorWeights,
+                                        criticWeights: bestCriticWeights,
+                                        bestReward: bestRewardAllTime,
+                                        bestCircles: bestCirclesAllTime,
+                                        currentGeneration: currentGeneration, // Sauvegarde la génération actuelle
+                                        numIndividuals: parseInt(numIndividualsInput.value),
+                                        numGenerations: parseInt(numGenerationsInput.value),
+                                        episodesPerIndividual: parseInt(episodesPerIndividualInput.value),
+                                        mutationRate: parseFloat(mutationRateInput.value),
+                                        learningRateActor: parseFloat(learningRateActorInput.value),
+                                        learningRateCritic: parseFloat(learningRateCriticInput.value),
+                                        gamma: parseFloat(gammaInput.value),
+                                        numElitism: parseInt(numElitismInput.value),
+                                        collectionDistanceThreshold: parseFloat(collectionDistanceThresholdInput.value),
+                                        stagnationPenalty: parseFloat(stagnationPenaltyInput.value),
+                                        stagnationThresholdSteps: parseInt(stagnationThresholdStepsInput.value),
+                                        actionChangePenalty: parseFloat(actionChangePenaltyInput.value),
+                                        timestamp: new Date().toISOString()
+                                };
+                                const jsonString = JSON.stringify(dataToSave, null, 2);
+                                const blob = new Blob([jsonString], { type: 'application/json' });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `actor_critic_agent_` + currentGeneration + `_gen.json`;
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                                URL.revokeObjectURL(url);
+                                log("Agent configuration saved to JSON file.");
+                        } else {
+                                log("No trained agent to save. Please run training first.");
+                        }
                 });
 
                 loadButton.addEventListener('click', () => {
-                    loadFileInput.click(); // Déclenche le clic sur l'input de fichier caché
+                        loadFileInput.click(); // Déclenche le clic sur l'input de fichier caché
                 });
 
                 loadFileInput.addEventListener('change', (event) => {
-                    const file = event.target.files[0];
-                    if (!file) {
-                        return;
-                    }
-
-                    const reader = new FileReader();
-                    reader.onload = async (e) => {
-                        try {
-                            const loadedData = JSON.parse(e.target.result);
-
-                            // Charger les poids
-                            if (loadedData.actorWeights && loadedData.criticWeights) {
-                                bestActorWeights = loadedData.actorWeights;
-                                bestCriticWeights = loadedData.criticWeights;
-
-                                // Mettre à jour les statistiques globales
-                                bestRewardAllTime = loadedData.bestReward || 0;
-                                bestCirclesAllTime = loadedData.bestCircles || 0;
-                                currentGeneration = loadedData.currentGeneration || 0; // Charge la génération depuis le fichier
-
-                                bestAgentInstance = new ActorCritic(
-                                    parseFloat(learningRateActorInput.value),
-                                    parseFloat(learningRateCriticInput.value),
-                                    parseFloat(gammaInput.value),
-                                    getCurrentState().stateFeatures.length,
-                                    8, // S'assurer que le nombre d'actions est correct lors du chargement
-                                    bestActorWeights,
-                                    bestCriticWeights
-                                );
-                                log("Agent weights loaded from file.");
-
-                                bestRewardAllTimeSpan.textContent = bestRewardAllTime.toFixed(2);
-                                bestCirclesAllTimeSpan.textContent = bestCirclesAllTime;
-                                currentGenerationSpan.textContent = `${currentGeneration} (Chargé)`; // Indique la génération chargée
-
-                                // L'historique n'est plus utilisé pour le graphique
-                                trainingHistory = []; // Assurez-vous qu'il est vide après le chargement pour éviter des données résiduelles
-                                // updateLearningCurveChart(); // Appel supprimé
-
-
-                                // Applique la couleur verte si les données chargées indiquent un meilleur score non nul
-                                if (bestRewardAllTime > 0 || bestCirclesAllTime > 0) {
-                                    bestRewardAllTimeSpan.classList.add('record-achieved-color');
-                                    bestCirclesAllTimeSpan.classList.add('record-achieved-color');
-                                } else {
-                                    bestRewardAllTimeSpan.classList.remove('record-achieved-color');
-                                    bestCirclesAllTimeSpan.classList.remove('record-achieved-color');
-                                }
-
-                                // Mettre à jour les paramètres de l'UI si présents dans le fichier
-                                if (loadedData.numIndividuals) numIndividualsInput.value = loadedData.numIndividuals;
-                                if (loadedData.numGenerations) numGenerationsInput.value = loadedData.numGenerations;
-                                if (loadedData.episodesPerIndividual) episodesPerIndividualInput.value = loadedData.episodesPerIndividual;
-                                if (loadedData.mutationRate) mutationRateInput.value = loadedData.mutationRate;
-                                if (loadedData.learningRateActor) learningRateActorInput.value = loadedData.learningRateActor;
-                                if (loadedData.learningRateCritic) learningRateCriticInput.value = loadedData.learningRateCritic;
-                                if (loadedData.gamma) gammaInput.value = loadedData.gamma;
-                                if (loadedData.numElitism) numElitismInput.value = loadedData.numElitism;
-                                if (loadedData.collectionDistanceThreshold) collectionDistanceThresholdInput.value = loadedData.collectionDistanceThreshold;
-                                if (loadedData.stagnationPenalty) stagnationPenaltyInput.value = loadedData.stagnationPenalty;
-                                if (loadedData.stagnationThresholdSteps) stagnationThresholdStepsInput.value = loadedData.stagnationThresholdSteps;
-                                if (loadedData.actionChangePenalty) actionChangePenaltyInput.value = loadedData.actionChangePenalty;
-
-                                updateRewardParameters(); // S'assurer que les variables globales sont synchronisées
-
-                                testBestIAButton.disabled = false; // Permet de tester l'IA chargée
-                                stopTestButtonVisual.disabled = true; // Pas de test en cours
-                                startButton.disabled = false; // Permet de démarrer un nouvel entraînement
-                                stopButton.disabled = true; // Pas d'entraînement en cours
-
-                                // Effacer les données d'IndexedDB pour éviter des conflits si l'utilisateur charge et oublie
-                                await clearIndexedDB();
-                                log("IndexedDB cleared after loading from file to prevent auto-loading conflicts.");
-
-                            } else {
-                                log("Données d'agent invalides ou incomplètes dans le fichier.");
-                            }
-                        } catch (e) {
-                            console.error("Erreur lors de l'analyse ou du chargement du fichier :", e);
-                            log("Échec du chargement de l'agent à partir du fichier. Assurez-vous que c'est un JSON valide.");
+                        const file = event.target.files[0];
+                        if (!file) {
+                                return;
                         }
-                    };
-                    reader.readAsText(file);
+
+                        const reader = new FileReader();
+                        reader.onload = async (e) => {
+                                try {
+                                        const loadedData = JSON.parse(e.target.result);
+
+                                        // Charger les poids
+                                        if (loadedData.actorWeights && loadedData.criticWeights) {
+                                                bestActorWeights = loadedData.actorWeights;
+                                                bestCriticWeights = loadedData.criticWeights;
+
+                                                // Mettre à jour les statistiques globales
+                                                bestRewardAllTime = loadedData.bestReward || 0;
+                                                bestCirclesAllTime = loadedData.bestCircles || 0;
+                                                currentGeneration = loadedData.currentGeneration || 0; // Charge la génération depuis le fichier // AJOUT
+
+                                                bestAgentInstance = new ActorCritic(
+                                                        parseFloat(learningRateActorInput.value),
+                                                        parseFloat(learningRateCriticInput.value),
+                                                        parseFloat(gammaInput.value),
+                                                        getCurrentState().stateFeatures.length,
+                                                        8, // AJOUT: S'assurer que le nombre d'actions est correct lors du chargement
+                                                        bestActorWeights,
+                                                        bestCriticWeights
+                                                );
+                                                log("Agent weights loaded from file.");
+
+                                                bestRewardAllTimeSpan.textContent = bestRewardAllTime.toFixed(2);
+                                                bestCirclesAllTimeSpan.textContent = bestCirclesAllTime;
+                                                currentGenerationSpan.textContent = `${currentGeneration} (Chargé)`; // Indique la génération chargée
+
+                                                // Mettre à jour les paramètres de l'UI si présents dans le fichier
+                                                if (loadedData.numIndividuals) numIndividualsInput.value = loadedData.numIndividuals;
+                                                if (loadedData.numGenerations) numGenerationsInput.value = loadedData.numGenerations;
+                                                if (loadedData.episodesPerIndividual) episodesPerIndividualInput.value = loadedData.episodesPerIndividual;
+                                                if (loadedData.mutationRate) mutationRateInput.value = loadedData.mutationRate;
+                                                if (loadedData.learningRateActor) learningRateActorInput.value = loadedData.learningRateActor;
+                                                if (loadedData.learningRateCritic) learningRateCriticInput.value = loadedData.learningRateCritic;
+                                                if (loadedData.gamma) gammaInput.value = loadedData.gamma;
+                                                if (loadedData.numElitism) numElitismInput.value = loadedData.numElitism;
+                                                if (loadedData.collectionDistanceThreshold) collectionDistanceThresholdInput.value = loadedData.collectionDistanceThreshold;
+                                                if (loadedData.stagnationPenalty) stagnationPenaltyInput.value = loadedData.stagnationPenalty;
+                                                if (loadedData.stagnationThresholdSteps) stagnationThresholdStepsInput.value = loadedData.stagnationThresholdSteps;
+                                                if (loadedData.actionChangePenalty) actionChangePenaltyInput.value = loadedData.actionChangePenalty;
+
+                                                updateRewardParameters(); // S'assurer que les variables globales sont synchronisées
+
+                                                testBestIAButton.disabled = false; // Permet de tester l'IA chargée
+                                                stopTestButtonVisual.disabled = true; // Pas de test en cours
+                                                startButton.disabled = false; // Permet de démarrer un nouvel entraînement
+                                                stopButton.disabled = true; // Pas d'entraînement en cours
+
+                                                // Effacer les données d'IndexedDB pour éviter des conflits si l'utilisateur charge et oublie
+                                                await clearIndexedDB();
+                                                log("IndexedDB cleared after loading from file to prevent auto-loading conflicts.");
+
+                                        } else {
+                                                log("Données d'agent invalides ou incomplètes dans le fichier.");
+                                        }
+                                } catch (e) {
+                                        console.error("Erreur lors de l'analyse ou du chargement du fichier :", e);
+                                        log("Échec du chargement de l'agent à partir du fichier. Assurez-vous que c'est un JSON valide.");
+                                }
+                        };
+                        reader.readAsText(file);
                 });
 
                 resetButton.addEventListener('click', async () => {
-                    if (confirm("Êtes-vous sûr de vouloir RÉINITIALISER complètement toutes les données et paramètres d'entraînement ? Cela effacera également les données sauvegardées dans le stockage local de votre navigateur.")) {
-                        isTraining = false;
-                        isTestingVisual = false;
-                        if (animationFrameId) {
-                            cancelAnimationFrame(animationFrameId);
-                            animationFrameId = null;
+                        if (confirm("Êtes-vous sûr de vouloir RÉINITIALISER complètement toutes les données et paramètres d'entraînement ? Cela effacera également les données sauvegardées dans le stockage local de votre navigateur.")) {
+                                isTraining = false;
+                                isTestingVisual = false;
+                                if (animationFrameId) {
+                                        cancelAnimationFrame(animationFrameId);
+                                        animationFrameId = null;
+                                }
+
+                                // Réinitialiser les variables d'état d'entraînement globales
+                                bestRewardAllTime = 0;
+                                bestCirclesAllTime = 0;
+                                bestActorWeights = null;
+                                bestCriticWeights = null;
+                                bestAgentInstance = null;
+                                currentGeneration = 0; // Réinitialise la génération à 0 // AJOUT
+
+                                // Réinitialiser les éléments de l'interface utilisateur aux valeurs par défaut
+                                currentGenerationSpan.textContent = '0';
+                                bestRewardAllTimeSpan.textContent = '0';
+                                bestCirclesAllTimeSpan.textContent = '0';
+                                currentTestScoreSpan.textContent = '0';
+                                circlesCollectedTestSpan.textContent = '0';
+
+                                // Réinitialiser les champs de saisie de l'interface utilisateur à leurs valeurs initiales
+                                numIndividualsInput.value = 10;
+                                numGenerationsInput.value = 100;
+                                episodesPerIndividualInput.value = 50;
+                                mutationRateInput.value = 0.05;
+                                learningRateActorInput.value = 0.001;
+                                learningRateCriticInput.value = 0.005;
+                                gammaInput.value = 0.99;
+                                numElitismInput.value = 1;
+                                collectionDistanceThresholdInput.value = 10;
+                                stagnationPenaltyInput.value = -0.2;
+                                stagnationThresholdStepsInput.value = 30;
+                                actionChangePenaltyInput.value = -0.02;
+
+                                updateRewardParameters(); // Synchronise les variables globales avec les valeurs par défaut de l'UI
+
+                                // Réinitialiser les états des boutons
+                                startButton.disabled = false;
+                                stopButton.disabled = true;
+                                testBestIAButton.disabled = true;
+                                stopTestButtonVisual.disabled = true;
+
+                                // Effacer IndexedDB
+                                await clearIndexedDB();
+                                log("Toutes les données d'entraînement et le cache local ont été réinitialisés.");
+
+                                resetGameEnvironment();
+                                drawGame();
                         }
-
-                        // Réinitialiser les variables d'état d'entraînement globales
-                        bestRewardAllTime = 0;
-                        bestCirclesAllTime = 0;
-                        bestActorWeights = null;
-                        bestCriticWeights = null;
-                        bestAgentInstance = null;
-                        currentGeneration = 0; // Réinitialise la génération à 0
-
-                        // Réinitialiser les éléments de l'interface utilisateur aux valeurs par défaut
-                        currentGenerationSpan.textContent = '0';
-                        bestRewardAllTimeSpan.textContent = '0';
-                        bestCirclesAllTimeSpan.textContent = '0';
-                        // Supprime la classe verte lors de la réinitialisation
-                        bestRewardAllTimeSpan.classList.remove('record-achieved-color');
-                        bestCirclesAllTimeSpan.classList.remove('record-achieved-color');
-
-                        currentTestScoreSpan.textContent = '0';
-                        circlesCollectedTestSpan.textContent = '0';
-
-                        // L'historique n'est plus utilisé pour le graphique
-                        trainingHistory = [];
-                        // updateLearningCurveChart(); // Appel supprimé
-
-
-                        // Réinitialiser les champs de saisie de l'interface utilisateur à leurs valeurs initiales
-                        numIndividualsInput.value = 10;
-                        numGenerationsInput.value = 100;
-                        episodesPerIndividualInput.value = 50;
-                        mutationRateInput.value = 0.05;
-                        learningRateActorInput.value = 0.001;
-                        learningRateCriticInput.value = 0.005;
-                        gammaInput.value = 0.99;
-                        numElitismInput.value = 1;
-                        collectionDistanceThresholdInput.value = 10;
-                        stagnationPenaltyInput.value = -0.2;
-                        stagnationThresholdStepsInput.value = 30;
-                        actionChangePenaltyInput.value = -0.02;
-                        infiniteGenerationsCheckbox.checked = false;
-                        numGenerationsInput.disabled = false;
-
-                        updateRewardParameters(); // Synchronise les variables globales avec les valeurs par défaut de l'UI
-
-                        // Réinitialiser les états des boutons
-                        startButton.disabled = false;
-                        stopButton.disabled = true;
-                        testBestIAButton.disabled = true;
-                        stopTestButtonVisual.disabled = true;
-
-                        // Effacer IndexedDB
-                        await clearIndexedDB();
-                        log("Toutes les données d'entraînement et le cache local ont été réinitialisés.");
-
-                        resetGameEnvironment();
-                        drawGame();
-                    }
                 });
 
                 clearCacheButton.addEventListener('click', async () => {
-                    if (confirm("Êtes-vous sûr de vouloir effacer les données d'entraînement sauvegardées localement dans le cache de votre navigateur ? Cela n'affectera pas la session d'entraînement actuelle.")) {
-                        await clearIndexedDB();
-                        // Ne réinitialise pas bestActorWeights, bestCriticWeights, bestAgentInstance ici
-                        // car l'entraînement en cours pourrait vouloir continuer.
-                        // Cependant, le test visuel sera désactivé s'il n'y a plus d'agent en mémoire après un rechargement.
-                        if (!isTraining) { // Si l'entraînement n'est pas en cours, désactiver le bouton de test
-                            bestActorWeights = null;
-                            bestCriticWeights = null;
-                            bestAgentInstance = null;
-                            testBestIAButton.disabled = true; // Désactiver le bouton de test s'il n'y a pas d'agent en mémoire
-                            // S'assurer qu'ils sont gris si le cache est vidé et pas d'entraînement en cours
-                            bestRewardAllTimeSpan.classList.remove('record-achieved-color');
-                            bestCirclesAllTimeSpan.classList.remove('record-achieved-color');
+                        if (confirm("Êtes-vous sûr de vouloir effacer les données d'entraînement sauvegardées localement dans le cache de votre navigateur ? Cela n'affectera pas la session d'entraînement actuelle.")) {
+                                await clearIndexedDB();
+                                // Ne réinitialise pas bestActorWeights, bestCriticWeights, bestAgentInstance ici
+                                // car l'entraînement en cours pourrait vouloir continuer.
+                                // Cependant, le test visuel sera désactivé s'il n'y a plus d'agent en mémoire après un rechargement.
+                                if (!isTraining) { // Si l'entraînement n'est pas en cours, désactiver le bouton de test
+                                        bestActorWeights = null;
+                                        bestCriticWeights = null;
+                                        bestAgentInstance = null;
+                                        testBestIAButton.disabled = true; // Désactiver le bouton de test s'il n'y a pas d'agent en mémoire
+                                }
+                                log("Cache des données d'entraînement local effacé.");
                         }
-                        // L'historique n'est plus utilisé pour le graphique
-                        trainingHistory = [];
-                        // updateLearningCurveChart(); // Appel supprimé
-                        log("Cache des données d'entraînement local effacé.");
-                    }
                 });
 
 
@@ -1741,62 +1659,40 @@
                         resetGameEnvironment();
                         drawGame();
 
-                        // L'initialisation du graphique est supprimée
-                        // initializeLearningCurveChart();
-
                         // Initialise IndexedDB et tente de charger les données
                         await openDatabase();
                         const loadedData = await loadWeightsFromIndexedDB();
                         if (loadedData) {
-                            bestActorWeights = loadedData.actorWeights;
-                            bestCriticWeights = loadedData.criticWeights;
-                            bestRewardAllTime = loadedData.bestReward || 0;
-                            bestCirclesAllTime = loadedData.bestCircles || 0;
-                            currentGeneration = loadedData.currentGeneration || 0;
+                                bestActorWeights = loadedData.actorWeights;
+                                bestCriticWeights = loadedData.criticWeights;
+                                bestRewardAllTime = loadedData.bestReward || 0;
+                                bestCirclesAllTime = loadedData.bestCircles || 0;
+                                currentGeneration = loadedData.currentGeneration || 0; // Charge la génération au démarrage // AJOUT
 
-                            bestAgentInstance = new ActorCritic(
-                                parseFloat(learningRateActorInput.value),
-                                parseFloat(learningRateCriticInput.value),
-                                parseFloat(gammaInput.value),
-                                getCurrentState().stateFeatures.length,
-                                8, // S'assurer que le nombre d'actions est correct lors du chargement
-                                bestActorWeights,
-                                bestCriticWeights
-                            );
+                                bestAgentInstance = new ActorCritic(
+                                        parseFloat(learningRateActorInput.value),
+                                        parseFloat(learningRateCriticInput.value),
+                                        parseFloat(gammaInput.value),
+                                        getCurrentState().stateFeatures.length,
+                                        8, // AJOUT: S'assurer que le nombre d'actions est correct lors du chargement
+                                        bestActorWeights,
+                                        bestCriticWeights
+                                );
 
-                            bestRewardAllTimeSpan.textContent = bestRewardAllTime.toFixed(2);
-                            bestCirclesAllTimeSpan.textContent = bestCirclesAllTime;
-                            currentGenerationSpan.textContent = `${currentGeneration} (Chargé)`; // Indique que c'est des données chargées
+                                bestRewardAllTimeSpan.textContent = bestRewardAllTime.toFixed(2);
+                                bestCirclesAllTimeSpan.textContent = bestCirclesAllTime;
+                                currentGenerationSpan.textContent = `${currentGeneration} (Chargé)`; // Indique que c'est des données chargées
 
-                            // L'historique n'est plus utilisé pour le graphique
-                            trainingHistory = []; // S'assurer qu'il est vide après le chargement
-                            // updateLearningCurveChart(); // Appel supprimé
-
-
-                            // Applique la couleur verte si les données chargées indiquent un meilleur score non nul
-                            if (bestRewardAllTime > 0 || bestCirclesAllTime > 0) {
-                                bestRewardAllTimeSpan.classList.add('record-achieved-color');
-                                bestCirclesAllTimeSpan.classList.add('record-achieved-color');
-                            } else {
-                                bestRewardAllTimeSpan.classList.remove('record-achieved-color');
-                                bestCirclesAllTimeSpan.classList.remove('record-achieved-color');
-                            }
-
-                            testBestIAButton.disabled = false; // Active le bouton de test si un agent est chargé
-                            log("Session d'entraînement précédente chargée depuis IndexedDB.");
+                                testBestIAButton.disabled = false; // Active le bouton de test si un agent est chargé
+                                log("Session d'entraînement précédente chargée depuis IndexedDB.");
                         } else {
-                            testBestIAButton.disabled = true; // Garde le bouton de test désactivé si aucun agent
-                            log("Aucune session d'entraînement précédente trouvée.");
-                            // S'assurer qu'ils sont gris si aucune donnée n'est chargée
-                            bestRewardAllTimeSpan.classList.remove('record-achieved-color');
-                            bestCirclesAllTimeSpan.classList.remove('record-achieved-color');
+                                testBestIAButton.disabled = true; // Garde le bouton de test désactivé si aucun agent
+                                log("Aucune session d'entraînement précédente trouvée.");
                         }
 
                         updateRewardParameters(); // Initialise les paramètres de récompense au chargement
                         log("Prêt à commencer l'entraînement génétique.");
                         log("Le jeu est prêt. Lancez l'entraînement pour qu'une IA soit disponible pour le test visuel.");
-                        // Assurez-vous que l'état du champ "Générations" reflète la case à cocher infinie au démarrage.
-                        numGenerationsInput.disabled = infiniteGenerationsCheckbox.checked;
                 };
 
         </script>
