@@ -1,0 +1,627 @@
+/* Importation de la police Inter pour un look moderne et lisible */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+/* Définition des variables CSS pour une gestion facile du thème */
+:root {
+	--primary-color-start: #6a11cb;
+	/* Violet */
+	--primary-color-end: #2575fc;
+	/* Bleu */
+	--primary-gradient: linear-gradient(45deg, var(--primary-color-start) 0%, var(--primary-color-end) 100%);
+	/* Dégradé Violet-Bleu */
+	--secondary-gradient: linear-gradient(45deg, var(--primary-color-end) 0%, var(--primary-color-start) 100%);
+	/* Dégradé Bleu-Violet pour le survol */
+	--dark-bg: #121212;
+	/* Arrière-plan très sombre */
+	--container-bg: #1e1e1e;
+	/* Arrière-plan du conteneur principal */
+	--section-bg: #2a2a2a;
+	/* Arrière-plan des sections individuelles */
+	--text-light: #e0e0e0;
+	/* Couleur de texte principale claire */
+	--text-muted: #b0b0b0;
+	/* Couleur de texte secondaire/labels */
+	--accent-color-green: #00e676;
+	/* Vert vif pour les valeurs positives */
+	--accent-color-yellow: #ffeb3b;
+	/* Jaune pour les meilleurs scores */
+	--border-color: #3a3a3a;
+	/* Couleur des bordures subtiles */
+	--shadow-dark: rgba(0, 0, 0, 0.7);
+	/* Ombre prononcée pour la profondeur */
+	--shadow-light: rgba(0, 0, 0, 0.4);
+	/* Ombre plus légère pour les détails */
+}
+
+body {
+	background: var(--dark-bg);
+	color: var(--text-light);
+	font-family: 'Inter', sans-serif;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	min-height: 100vh;
+	box-sizing: border-box;
+	line-height: 1.6;
+	position: relative;
+	overflow-x: hidden;
+}
+
+.container {
+	background-color: var(--container-bg);
+	border-radius: 18px;
+	box-shadow: 0 10px 30px var(--shadow-dark);
+	padding: 35px;
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+	border: 1px solid var(--border-color);
+	box-sizing: border-box;
+}
+
+h1,
+h2 {
+	color: var(--text-light);
+	text-align: center;
+	margin-bottom: 0;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+	background: var(--primary-gradient);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.section-panel {
+	background-color: var(--section-bg);
+	border-radius: 12px;
+	box-shadow: inset 0 3px 8px var(--shadow-light);
+	padding: 20px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid var(--border-color);
+	box-sizing: border-box;
+}
+
+button {
+	background: var(--primary-gradient);
+	background-size: 200% auto;
+	color: white;
+	border: none;
+	padding: 12px 25px;
+	border-radius: 10px;
+	cursor: pointer;
+	font-size: 17px;
+	font-weight: 600;
+	transition: all 0.4s ease;
+	box-shadow: 0 5px 15px var(--shadow-dark);
+	position: relative;
+	overflow: hidden;
+	letter-spacing: 0.5px;
+}
+
+button:hover:not(:disabled) {
+	background-position: right center;
+	transform: translateY(-3px) scale(1.02);
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.9);
+}
+
+button:active:not(:disabled) {
+	transform: translateY(-1px) scale(0.99);
+	box-shadow: 0 3px 10px var(--shadow-dark);
+}
+
+button:disabled {
+	background: #4a4a4a;
+	cursor: not-allowed;
+	box-shadow: none;
+	opacity: 0.6;
+	transform: none;
+}
+
+label {
+	color: var(--text-muted);
+	font-size: 16px;
+	white-space: nowrap;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-weight: 500;
+}
+
+input[type="number"] {
+	background-color: #333333;
+	color: var(--text-light);
+	border: 1px solid var(--border-color);
+	padding: 10px 12px;
+	border-radius: 8px;
+	width: 100px;
+	font-size: 16px;
+	text-align: center;
+	transition: border-color 0.3s ease, box-shadow 0.3s ease;
+	appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+input[type="number"]:focus {
+	outline: none;
+	border-color: var(--primary-color-end);
+	box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.5);
+}
+
+.training-stats-panel {
+	flex-direction: column;
+	gap: 15px;
+	width: 100%;
+	/* S'assurer qu'il prend toute la largeur disponible */
+	max-width: 450px;
+	/* Augmenté pour les boutons côte à côte */
+	margin: 0 auto;
+}
+
+.training-stats-panel h2 {
+	margin-top: 0;
+	margin-bottom: 15px;
+	text-align: center;
+	background: var(--primary-gradient);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.training-stats-panel p {
+	margin: 10px 0;
+	font-size: 16px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+}
+
+.training-stats-panel span {
+	font-weight: 600;
+	color: var(--accent-color-green);
+}
+
+.training-stats-panel .best-score-label {
+	color: var(--accent-color-yellow);
+	font-weight: bold;
+}
+
+/* Nouveau style pour le groupe de boutons de sauvegarde */
+.training-stats-panel .save-load-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	/* Permet aux boutons de passer à la ligne si l'espace est insuffisant */
+	justify-content: center;
+	gap: 10px;
+	margin-top: 15px;
+	padding-top: 15px;
+	border-top: 1px solid var(--border-color);
+}
+
+.game-area-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+	justify-content: center;
+	align-items: center;
+	padding: 30px;
+	background-color: var(--section-bg);
+	border-radius: 12px;
+	box-shadow: inset 0 3px 8px var(--shadow-light);
+	border: 1px solid var(--border-color);
+	flex-grow: 1;
+}
+
+#gameCanvas {
+	width: 100%;
+	max-width: 700px;
+	height: auto;
+	aspect-ratio: 3 / 2;
+	background-color: #111111;
+	border-radius: 10px;
+	box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+	border: 1px solid var(--border-color);
+	box-sizing: border-box;
+}
+
+.test-sidebar {
+	flex-direction: column;
+	gap: 20px;
+	width: 100%;
+	max-width: 350px;
+}
+
+.test-sidebar h2 {
+	margin-top: 0;
+	margin-bottom: 5px;
+	text-align: center;
+	background: var(--primary-gradient);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.test-sidebar .button-group {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 15px;
+	width: 100%;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.test-sidebar .test-stats-display-area p {
+	margin: 10px 0;
+	font-size: 16px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.test-sidebar .test-stats-display-area span {
+	font-weight: 600;
+	color: var(--accent-color-green);
+}
+
+.settings-panel {
+	position: fixed;
+	top: 0;
+	right: -350px;
+	width: 320px;
+	height: 100%;
+	background-color: var(--container-bg);
+	box-shadow: -5px 0 15px var(--shadow-dark);
+	transition: right 0.3s ease-in-out;
+	z-index: 1000;
+	padding: 20px;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+	overflow-y: auto;
+	border-left: 1px solid var(--border-color);
+}
+
+.settings-panel.open {
+	right: 0;
+}
+
+.settings-panel h2 {
+	text-align: left;
+	margin-bottom: 15px;
+	background: var(--primary-gradient);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+/* Modifié: Supprimer le width:100% pour les labels afin qu'ils ne prennent pas toute la largeur */
+.settings-panel label {
+	/* width: 100%; */
+	/* Retiré pour permettre au texte d'être à côté de la checkbox */
+	justify-content: space-between;
+}
+
+.settings-panel input[type="number"] {
+	width: 80px;
+}
+
+/* Styles spécifiques pour les boutons dans le panneau des paramètres */
+.settings-panel button {
+	width: 100%;
+	/* S'assure que les boutons prennent toute la largeur disponible */
+	padding: 15px 20px;
+	/* Augmente le padding pour les rendre plus grands */
+	font-size: 18px;
+	/* Augmente la taille de la police */
+	box-sizing: border-box;
+	/* Inclut le padding dans la largeur totale */
+	display: flex;
+	/* Utilise flexbox pour l'alignement */
+	align-items: center;
+	/* Centre verticalement le contenu */
+	justify-content: center;
+	/* Centre horizontalement le contenu */
+}
+
+/* Nouveau style pour l'élément de paramètre de case à cocher */
+.settings-panel .checkbox-item {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	/* Changé de space-between à flex-start */
+	gap: 10px;
+	/* Ajout d'un gap pour l'espacement */
+	width: 100%;
+	/* Garder le width à 100% pour le conteneur du label et checkbox */
+	margin-top: -10px;
+	margin-bottom: 5px;
+}
+
+.settings-panel .checkbox-item label {
+	margin-right: 0;
+	/* Réinitialiser le margin-right car le gap gère l'espacement */
+	width: auto;
+	/* Permettre au label de ne prendre que l'espace nécessaire */
+}
+
+.settings-panel .checkbox-item input[type="checkbox"] {
+	width: 20px;
+	height: 20px;
+	accent-color: var(--primary-color-end);
+	cursor: pointer;
+}
+
+
+.settings-toggle-button {
+	background: var(--primary-gradient);
+	color: white;
+	border: none;
+	padding: 12px 15px;
+	border-radius: 10px;
+	cursor: pointer;
+	font-size: 17px;
+	font-weight: 600;
+	transition: all 0.4s ease;
+	box-shadow: 0 5px 15px var(--shadow-dark);
+	position: relative;
+	overflow: hidden;
+	letter-spacing: 0.5px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.settings-toggle-button:hover {
+	transform: translateY(-3px) scale(1.02);
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.9);
+}
+
+.settings-toggle-button:active {
+	transform: translateY(-1px) scale(0.99);
+	box-shadow: 0 3px 10px var(--shadow-dark);
+}
+
+/* Styles pour le nouveau panneau du graphique */
+.learning-curve-panel {
+	flex-direction: column;
+	gap: 15px;
+	width: 100%;
+	max-width: 600px;
+	/* Adaptez cette largeur à vos besoins */
+	margin: 0 auto;
+	min-height: 350px;
+	/* Hauteur minimale pour le graphique */
+}
+
+.learning-curve-panel h2 {
+	margin-top: 0;
+	margin-bottom: 15px;
+	text-align: center;
+	background: var(--primary-gradient);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.chart-container {
+	width: 100%;
+	height: 300px;
+	/* Hauteur fixe pour le graphique */
+	background-color: #1a1a1a;
+	/* Fond sombre pour le graphique */
+	border-radius: 8px;
+	overflow: hidden;
+	/* S'assurer que le graphique ne déborde pas */
+}
+
+
+/* Media Queries pour la responsivité */
+@media (max-width: 767px) {
+	.container {
+		margin: 0 10px;
+		padding: 20px;
+	}
+
+	.game-area-wrapper {
+		flex-direction: column;
+	}
+
+	.training-stats-panel,
+	.learning-curve-panel,
+	.test-sidebar {
+		max-width: 100%;
+	}
+}
+
+@media (min-width: 768px) {
+	.game-area-wrapper {
+		flex-direction: row;
+		justify-content: center;
+		align-items: flex-start;
+		/* Alignez les éléments en haut */
+		flex-wrap: wrap;
+		/* Permettre aux éléments de passer à la ligne */
+	}
+
+	.training-stats-panel {
+		width: auto;
+		max-width: 450px;
+		/* Augmenté pour les boutons côte à côte */
+		flex-basis: 30%;
+		/* Ajustez la base flexible */
+	}
+
+	.learning-curve-panel {
+		width: auto;
+		flex-basis: 60%;
+		/* Le graphique prendra plus de place */
+		max-width: 600px;
+	}
+
+	#gameCanvas {
+		flex-basis: 60%;
+		min-width: 400px;
+	}
+
+	.test-sidebar {
+		flex-basis: 30%;
+		min-width: 300px;
+	}
+}
+
+@media (min-width: 1024px) {
+	.container {
+		padding: 40px;
+	}
+
+	.controls {
+		order: 1;
+		width: 100%;
+	}
+
+	.game-area-wrapper {
+		order: 2;
+		/* Maintenez le wrapper au-dessus du panneau des paramètres */
+		flex-wrap: nowrap;
+		/* Les éléments ne passent plus à la ligne ici */
+		gap: 50px;
+	}
+
+	.training-stats-panel {
+		flex-basis: 400px;
+		/* Taille fixe ajustée */
+		max-width: 400px;
+		/* Taille fixe ajustée */
+		min-width: 300px;
+	}
+
+	.learning-curve-panel {
+		flex-basis: 550px;
+		/* Taille fixe pour le graphique */
+		max-width: 550px;
+		min-width: 400px;
+	}
+
+	#gameCanvas {
+		width: auto;
+		height: auto;
+		max-width: 600px;
+		max-height: 400px;
+		flex-basis: auto;
+		/* Laissez-le s'adapter */
+	}
+
+	.test-sidebar {
+		flex-basis: 350px;
+		max-width: 350px;
+		gap: 25px;
+	}
+
+	.test-sidebar h2 {
+		margin-top: 0;
+		margin-bottom: 10px;
+	}
+
+	.test-sidebar .button-group {
+		margin-top: 15px;
+		margin-bottom: 15px;
+	}
+
+	.settings-panel {
+		right: -350px;
+		/* Gardez le panneau de réglages à droite */
+	}
+}
+
+/* Styles pour la modale de confirmation */
+.modal {
+	display: none;
+	/* Correction: Caché par défaut */
+	position: fixed;
+	/* Reste en place */
+	z-index: 2000;
+	/* Se superpose à tout le reste */
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	/* Activer le défilement si nécessaire */
+	background-color: rgba(0, 0, 0, 0.7);
+	/* Fond semi-transparent */
+	justify-content: center;
+	align-items: center;
+}
+
+.modal-content {
+	background-color: var(--container-bg);
+	margin: auto;
+	padding: 30px;
+	border: 1px solid var(--border-color);
+	border-radius: 12px;
+	width: 80%;
+	max-width: 400px;
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+	text-align: center;
+	transform: translateY(-20px);
+	opacity: 0;
+	animation: fadeIn 0.3s forwards;
+}
+
+.modal-content p {
+	color: var(--text-light);
+	font-size: 1.1em;
+	margin-bottom: 25px;
+}
+
+.modal-buttons {
+	display: flex;
+	justify-content: center;
+	gap: 15px;
+}
+
+.modal-buttons button {
+	padding: 10px 20px;
+	font-size: 1em;
+	border-radius: 8px;
+	transition: all 0.3s ease;
+}
+
+.modal-buttons .cancel-button {
+	background: #555;
+	background-image: linear-gradient(45deg, #555 0%, #777 100%);
+}
+
+.modal-buttons .cancel-button:hover {
+	background-image: linear-gradient(45deg, #777 0%, #555 100%);
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-20px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
