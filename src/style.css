@@ -10,6 +10,8 @@
 	--primary-gradient: linear-gradient(45deg, var(--primary-color-start) 0%, var(--primary-color-end) 100%);
 	/* Dégradé Violet-Bleu */
 	--secondary-gradient: linear-gradient(45deg, var(--primary-color-end) 0%, var(--primary-color-start) 100%);
+
+	--reset-gradient: linear-gradient(90deg, rgba(106, 17, 203, 1) 0%, rgba(255, 0, 0, 1) 90%);
 	/* Dégradé Bleu-Violet pour le survol */
 	--dark-bg: #121212;
 	/* Arrière-plan très sombre */
@@ -108,6 +110,42 @@ button {
 	letter-spacing: 0.5px;
 }
 
+r-button {
+	background: var(--reset-gradient);
+	background-size: 200% auto;
+	color: white;
+	border: none;
+	padding: 12px 25px;
+	border-radius: 10px;
+	cursor: pointer;
+	font-size: 17px;
+	font-weight: 600;
+	transition: all 0.4s ease;
+	box-shadow: 0 5px 15px var(--shadow-dark);
+	position: relative;
+	overflow: hidden;
+	letter-spacing: 0.5px;
+}
+
+r-button:hover:not(:disabled) {
+	background-position: right center;
+	transform: translateY(-3px) scale(1.02);
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.9);
+}
+
+r-button:active:not(:disabled) {
+	transform: translateY(-1px) scale(0.99);
+	box-shadow: 0 3px 10px var(--shadow-dark);
+}
+
+r-button:disabled {
+	background: #4a4a4a;
+	cursor: not-allowed;
+	box-shadow: none;
+	opacity: 0.6;
+	transform: none;
+}
+
 button:hover:not(:disabled) {
 	background-position: right center;
 	transform: translateY(-3px) scale(1.02);
@@ -166,9 +204,7 @@ input[type="number"]:focus {
 	flex-direction: column;
 	gap: 15px;
 	width: 100%;
-	/* S'assurer qu'il prend toute la largeur disponible */
 	max-width: 450px;
-	/* Augmenté pour les boutons côte à côte */
 	margin: 0 auto;
 }
 
@@ -272,11 +308,12 @@ input[type="number"]:focus {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	width: 100%;
 }
 
 .test-sidebar .test-stats-display-area span {
 	font-weight: 600;
-	color: var(--accent-color-green);
+	color: var(--primary-color-end);
 }
 
 .settings-panel {

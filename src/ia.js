@@ -44,7 +44,6 @@ const saveButton = document.getElementById('saveButton');
 const loadButton = document.getElementById('loadButton');
 const loadFileInput = document.getElementById('loadFileInput'); // Input de fichier caché
 const resetButton = document.getElementById('resetButton');
-const clearCacheButton = document.getElementById('clearCacheButton');
 
 // Références pour la modale de confirmation
 const customConfirmModal = document.getElementById('customConfirmModal');
@@ -1466,23 +1465,6 @@ resetButton.addEventListener('click', async () => {
 		isCanvasRenderingEnabled = true; // S'assurer que le rendu est activé
 		resetGameEnvironment();
 		drawGame();
-	}
-});
-
-clearCacheButton.addEventListener('click', async () => {
-	const confirmClear = await showCustomConfirm("Êtes-vous sûr de vouloir effacer les données d'entraînement sauvegardées localement dans le cache de votre navigateur ? Cela n'affectera pas la session d'entraînement actuelle.");
-	if (confirmClear) {
-		await clearIndexedDB();
-		// Ne réinitialise pas bestActorWeights, bestCriticWeights, bestAgentInstance ici
-		// car l'entraînement en cours pourrait vouloir continuer.
-		// Cependant, le test visuel sera désactivé s'il n'y a plus d'agent en mémoire après un rechargement.
-		if (!isTraining) { // Si l'entraînement n'est pas en cours, désactiver le bouton de test
-			bestActorWeights = null;
-			bestCriticWeights = null;
-			bestAgentInstance = null;
-			testBestIAButton.disabled = true; // Désactiver le bouton de test s'il n'y a pas d'agent en mémoire
-		}
-		log("Cache des données d'entraînement local effacé.");
 	}
 });
 
