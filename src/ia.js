@@ -553,7 +553,7 @@ function drawGame() {
 
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	// Préparation des styles pour les cercles
-	ctx.shadowBlur = 50;
+	ctx.shadowBlur = 10;
 	ctx.shadowColor = "blue";
 	ctx.fillStyle = '#4800ff';
 
