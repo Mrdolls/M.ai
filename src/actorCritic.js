@@ -1,5 +1,5 @@
 // actorCritic.js
-// Contient la définition de la classe ActorCritic, utilisée par le thread principal et les Web Workers.
+// Contient la définition de la classe ActorCritic, optimisée avec Float32Array.
 
 export class ActorCritic {
 	constructor(learningRateActor, learningRateCritic, gamma, numStates, numActions, initialActorWeights = null, initialCriticWeights = null) {
@@ -9,20 +9,24 @@ export class ActorCritic {
 		this.numActions = numActions;
 		this.numStates = numStates;
 
-		// Initialisation des poids de l'acteur
+		// Initialisation des poids de l'acteur avec Float32Array
 		if (initialActorWeights) {
-			this.actorWeights = JSON.parse(JSON.stringify(initialActorWeights));
+			this.actorWeights = new Float32Array(initialActorWeights);
 		} else {
-			this.actorWeights = Array(numActions).fill(null).map(() =>
-				Array(numStates).fill(null).map(() => Math.random() * 0.2 - 0.1)
-			);
+			this.actorWeights = new Float32Array(numActions * numStates);
+			for (let i = 0; i < this.actorWeights.length; i++) {
+				this.actorWeights[i] = Math.random() * 0.2 - 0.1;
+			}
 		}
 
-		// Initialisation des poids du critique
+		// Initialisation des poids du critique avec Float32Array
 		if (initialCriticWeights) {
-			this.criticWeights = JSON.parse(JSON.stringify(initialCriticWeights));
+			this.criticWeights = new Float32Array(initialCriticWeights);
 		} else {
-			this.criticWeights = Array(numStates).fill(null).map(() => Math.random() * 0.2 - 0.1);
+			this.criticWeights = new Float32Array(numStates);
+			for (let i = 0; i < this.criticWeights.length; i++) {
+				this.criticWeights[i] = Math.random() * 0.2 - 0.1;
+			}
 		}
 	}
 
@@ -35,10 +39,11 @@ export class ActorCritic {
 	}
 
 	predictActorScores(stateFeatures) {
-		const scores = Array(this.numActions).fill(0);
+		const scores = new Float32Array(this.numActions).fill(0);
 		for (let action = 0; action < this.numActions; action++) {
+			const baseIndex = action * this.numStates;
 			for (let i = 0; i < stateFeatures.length; i++) {
-				scores[action] += stateFeatures[i] * this.actorWeights[action][i];
+				scores[action] += stateFeatures[i] * this.actorWeights[baseIndex + i];
 			}
 		}
 		return scores;
@@ -72,29 +77,32 @@ export class ActorCritic {
 		const targetG = reward + this.gamma * nextV;
 		const tdError = targetG - currentV;
 
+		// Mise à jour des poids du critique
 		for (let i = 0; i < state.length; i++) {
 			this.criticWeights[i] += this.lrCritic * tdError * state[i];
 		}
 
+		// Mise à jour des poids de l'acteur
+		const baseIndex = actionIndex * this.numStates;
 		for (let i = 0; i < state.length; i++) {
-			this.actorWeights[actionIndex][i] += this.lrActor * tdError * state[i];
+			this.actorWeights[baseIndex + i] += this.lrActor * tdError * state[i];
 		}
 	}
 
 	getActorWeights() {
-		return JSON.parse(JSON.stringify(this.actorWeights));
+		return new Float32Array(this.actorWeights); // Retourne une copie
 	}
 
 	setActorWeights(newWeights) {
-		this.actorWeights = JSON.parse(JSON.stringify(newWeights));
+		this.actorWeights = new Float32Array(newWeights);
 	}
 
 	getCriticWeights() {
-		return JSON.parse(JSON.stringify(this.criticWeights));
+		return new Float32Array(this.criticWeights); // Retourne une copie
 	}
 
 	setCriticWeights(newWeights) {
-		this.criticWeights = JSON.parse(JSON.stringify(newWeights));
+		this.criticWeights = new Float32Array(newWeights);
 	}
 
 	loadBrain(brain) {
