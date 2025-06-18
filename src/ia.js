@@ -232,7 +232,7 @@ function onWorkerMessage(e) {
 // --- LOGIQUE DE L'ALGORITHME GÉNÉTIQUE ---
 
 async function runGenerations() {
-\	isTraining = true;
+	isTraining = true;
 	startButton.disabled = true;
 	stopButton.disabled = false;
 	testBestIAButton.disabled = true;
