@@ -540,7 +540,10 @@ function drawGame() {
 function visualTestGameLoop() {
 	if (!isTestingVisual) return;
 	const { stateFeatures } = getCurrentState();
+	if (bestAgentInstance != null)
+	{
 	const actionIndex = bestAgentInstance.selectAction(stateFeatures);
+	}
 	const { reward, collectedCount } = stepEnvironmentAndGetReward(actionIndex);
 
 	currentTestScoreSpan.textContent = (parseFloat(currentTestScoreSpan.textContent) + reward).toFixed(2);
