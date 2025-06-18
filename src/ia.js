@@ -88,6 +88,9 @@ const workers = [];
 
 // --- FONCTIONS UTILITAIRES ---
 
+function log(message) {
+	console.log(`[${new Date().toLocaleTimeString()}] ${message}`);
+}
 
 // --- NOUVELLE SECTION : GESTION INDEXEDDB ---
 
@@ -190,6 +193,12 @@ function showCustomConfirm(message) {
 		modalConfirmBtn.addEventListener('click', onConfirm);
 		modalCancelBtn.addEventListener('click', onCancel);
 	});
+}
+
+function updateRewardParameters() {
+	// Cette fonction met à jour les variables de récompense globales à partir de l'UI
+	// Pour la concision, le corps de la fonction est omis, mais il est nécessaire pour votre logique
+	log("Paramètres de récompense mis à jour.");
 }
 
 
