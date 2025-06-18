@@ -74,7 +74,7 @@ body {
 	padding: 35px;
 	width: 100%;
 	max-width: 1200px;
-	margin: 0 20px;
+	margin: 20px; /* MODIFICATION : marge ajoutée pour l'espacement sur mobile */
 	display: flex;
 	flex-direction: column;
 	gap: 30px;
@@ -103,7 +103,7 @@ body {
     width: 100%;
     height: 100%;
     background-color: rgba(18, 18, 18, 0.85);
-    display: flex; 
+    display: flex;
     justify-content: center;
     align-items: center;
     z-index: 3000;
@@ -332,6 +332,7 @@ input[type="number"]:focus {
 	width: 100%;
 	max-width: 450px;
 	margin: 0 auto;
+    align-items: stretch; /* MODIFICATION : pour que les enfants prennent toute la largeur */
 }
 
 .training-stats-panel h2 {
@@ -363,11 +364,9 @@ input[type="number"]:focus {
 	font-weight: bold;
 }
 
-/* Nouveau style pour le groupe de boutons de sauvegarde */
 .training-stats-panel .save-load-buttons {
 	display: flex;
 	flex-wrap: wrap;
-	/* Permet aux boutons de passer à la ligne si l'espace est insuffisant */
 	justify-content: center;
 	gap: 10px;
 	margin-top: 15px;
@@ -401,11 +400,14 @@ input[type="number"]:focus {
 	box-sizing: border-box;
 }
 
+/* MODIFICATION : Unification des styles du panneau de test avec le panneau d'entraînement */
 .test-sidebar {
 	flex-direction: column;
 	gap: 20px;
 	width: 100%;
 	max-width: 350px;
+    align-items: stretch; /* Pour que les enfants prennent toute la largeur */
+    height: auto; /* SUPPRESSION : Hauteur fixe supprimée pour la responsivité */
 }
 
 .test-sidebar h2 {
@@ -428,18 +430,34 @@ input[type="number"]:focus {
 	margin-bottom: 10px;
 }
 
+/* MODIFICATION : Style ajouté pour la zone d'affichage des stats */
+.test-sidebar .test-stats-display-area {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espace entre les lignes de stats */
+    width: 100%;
+    margin-top: 10px;
+}
+
 .test-sidebar .test-stats-display-area p {
-	margin: 10px 0;
+	margin: 0; /* Réinitialisation de la marge */
 	font-size: 16px;
 	display: flex;
-	justify-content: space-between;
+    justify-content: space-between; /* Aligne le label à gauche et la valeur à droite */
 	align-items: center;
 	width: 100%;
 }
 
+/* SUPPRESSION : Les IDs avec positionnement absolu et marges fixes ne sont plus nécessaires */
+/*
+#groupScore { ... }
+#currentTestScore { ... }
+#circlesCollectedTest { ... }
+*/
+
 .test-sidebar .test-stats-display-area span {
 	font-weight: 600;
-	color: var(--primary-color-end);
+	color: var(--accent-color-green); /* MODIFICATION : Couleur unifiée avec le panneau d'entraînement */
 }
 
 .settings-panel {
@@ -475,10 +493,7 @@ input[type="number"]:focus {
 	background-clip: text;
 }
 
-/* Modifié: Supprimer le width:100% pour les labels afin qu'ils ne prennent pas toute la largeur */
 .settings-panel label {
-	/* width: 100%; */
-	/* Retiré pour permettre au texte d'être à côté de la checkbox */
 	justify-content: space-between;
 }
 
@@ -486,22 +501,14 @@ input[type="number"]:focus {
 	width: 80px;
 }
 
-/* Styles spécifiques pour les boutons dans le panneau des paramètres */
 .settings-panel button {
-	/* S'assure que les boutons prennent toute la largeur disponible */
 	padding: 15px 20px;
-	/* Augmente le padding pour les rendre plus grands */
 	font-size: 18px;
-	/* Augmente la taille de la police */
 	box-sizing: border-box;
-	/* Inclut le padding dans la largeur totale */
 	display: flex;
-	/* Utilise flexbox pour l'alignement */
 	align-items: center;
-	/* Centre verticalement le contenu */
 	justify-content: center;
 	margin-left:220px;
-	/* Centre horizontalement le contenu */
 }
 
 #imgCenter{
@@ -509,25 +516,19 @@ input[type="number"]:focus {
 	justify-content: center;
 }
 
-/* Nouveau style pour l'élément de paramètre de case à cocher */
 .settings-panel .checkbox-item {
 	display: flex;
 	align-items: center;
 	justify-content: flex-start;
-	/* Changé de space-between à flex-start */
 	gap: 10px;
-	/* Ajout d'un gap pour l'espacement */
 	width: 100%;
-	/* Garder le width à 100% pour le conteneur du label et checkbox */
 	margin-top: -10px;
 	margin-bottom: 5px;
 }
 
 .settings-panel .checkbox-item label {
 	margin-right: 0;
-	/* Réinitialiser le margin-right car le gap gère l'espacement */
 	width: auto;
-	/* Permettre au label de ne prendre que l'espace nécessaire */
 }
 
 .settings-panel .checkbox-item input[type="checkbox"] {
@@ -597,16 +598,13 @@ input[type="number"]:focus {
 	box-shadow: 0 3px 10px var(--shadow-dark);
 }
 
-/* Styles pour le nouveau panneau du graphique */
 .learning-curve-panel {
 	flex-direction: column;
 	gap: 15px;
 	width: 100%;
 	max-width: 600px;
-	/* Adaptez cette largeur à vos besoins */
 	margin: 0 auto;
 	min-height: 350px;
-	/* Hauteur minimale pour le graphique */
 }
 
 .learning-curve-panel h2 {
@@ -622,22 +620,20 @@ input[type="number"]:focus {
 .chart-container {
 	width: 100%;
 	height: 300px;
-	/* Hauteur fixe pour le graphique */
 	background-color: #1a1a1a;
-	/* Fond sombre pour le graphique */
 	border-radius: 8px;
 	overflow: hidden;
-	/* S'assurer que le graphique ne déborde pas */
 }
 
 
 /* Media Queries pour la responsivité */
 @media (max-width: 767px) {
 	.container {
-		margin: 0 10px;
+		margin: 10px;
 		padding: 20px;
 	}
 
+    /* MODIFICATION : flex-direction column pour les wrappers sur mobile */
 	.game-area-wrapper {
 		flex-direction: column;
 	}
@@ -645,8 +641,13 @@ input[type="number"]:focus {
 	.training-stats-panel,
 	.learning-curve-panel,
 	.test-sidebar {
-		max-width: 100%;
+		max-width: 100%; /* Les panneaux prennent toute la largeur */
+        flex-basis: auto; /* Réinitialisation de la base flexible */
 	}
+
+    .test-sidebar {
+        min-width: 0; /* Réinitialisation de la largeur minimale */
+    }
 }
 
 @media (min-width: 768px) {
@@ -654,23 +655,18 @@ input[type="number"]:focus {
 		flex-direction: row;
 		justify-content: center;
 		align-items: flex-start;
-		/* Alignez les éléments en haut */
 		flex-wrap: wrap;
-		/* Permettre aux éléments de passer à la ligne */
 	}
 
 	.training-stats-panel {
 		width: auto;
 		max-width: 450px;
-		/* Augmenté pour les boutons côte à côte */
 		flex-basis: 30%;
-		/* Ajustez la base flexible */
 	}
 
 	.learning-curve-panel {
 		width: auto;
 		flex-basis: 60%;
-		/* Le graphique prendra plus de place */
 		max-width: 600px;
 	}
 
@@ -697,23 +693,18 @@ input[type="number"]:focus {
 
 	.game-area-wrapper {
 		order: 2;
-		/* Maintenez le wrapper au-dessus du panneau des paramètres */
 		flex-wrap: nowrap;
-		/* Les éléments ne passent plus à la ligne ici */
 		gap: 50px;
 	}
 
 	.training-stats-panel {
 		flex-basis: 400px;
-		/* Taille fixe ajustée */
 		max-width: 400px;
-		/* Taille fixe ajustée */
 		min-width: 300px;
 	}
 
 	.learning-curve-panel {
 		flex-basis: 550px;
-		/* Taille fixe pour le graphique */
 		max-width: 550px;
 		min-width: 400px;
 	}
@@ -724,7 +715,6 @@ input[type="number"]:focus {
 		max-width: 600px;
 		max-height: 400px;
 		flex-basis: auto;
-		/* Laissez-le s'adapter */
 	}
 
 	.test-sidebar {
@@ -735,7 +725,7 @@ input[type="number"]:focus {
 
 	.test-sidebar h2 {
 		margin-top: 0;
-		margin-bottom: 10px;
+		margin-bottom: -20px;
 	}
 
 	.test-sidebar .button-group {
@@ -745,26 +735,20 @@ input[type="number"]:focus {
 
 	.settings-panel {
 		right: -350px;
-		/* Gardez le panneau de réglages à droite */
 	}
 }
 
 /* Styles pour la modale de confirmation */
 .modal {
 	display: none;
-	/* Correction: Caché par défaut */
 	position: fixed;
-	/* Reste en place */
 	z-index: 2000;
-	/* Se superpose à tout le reste */
 	left: 0;
 	top: 0;
 	width: 100%;
 	height: 100%;
 	overflow: auto;
-	/* Activer le défilement si nécessaire */
 	background-color: rgba(0, 0, 0, 0.7);
-	/* Fond semi-transparent */
 	justify-content: center;
 	align-items: center;
 }
