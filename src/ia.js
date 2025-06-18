@@ -232,8 +232,7 @@ function onWorkerMessage(e) {
 // --- LOGIQUE DE L'ALGORITHME GÉNÉTIQUE ---
 
 async function runGenerations() {
-	log("Démarrage de l'entraînement génétique...");
-	isTraining = true;
+\	isTraining = true;
 	startButton.disabled = true;
 	stopButton.disabled = false;
 	testBestIAButton.disabled = true;
@@ -242,7 +241,6 @@ async function runGenerations() {
 	if (stateFeatureSize === 0) {
 		resetGameEnvironment();
 		stateFeatureSize = getCurrentState().stateFeatures.length;
-		log(`Taille des caractéristiques d'état déterminée : ${stateFeatureSize}`);
 	}
 
 	currentGaParams = {
@@ -261,8 +259,7 @@ async function runGenerations() {
 
 	currentPopulationBrains = [];
 	if (bestAgentInstance) {
-		log("Initialisation de la population à partir du meilleur agent existant.");
-		currentPopulationBrains.push(bestAgentInstance.saveBrain());
+ 		currentPopulationBrains.push(bestAgentInstance.saveBrain());
 		for (let i = 1; i < currentGaParams.numIndividuals; i++) {
 			const agent = new ActorCritic(currentGaParams.learningRateActor, currentGaParams.learningRateCritic, currentGaParams.gamma, currentGaParams.numStates, currentGaParams.numActions, bestAgentInstance.getActorWeights(), bestAgentInstance.getCriticWeights());
 			agent.setActorWeights(mutate(agent.getActorWeights(), 0.1));
@@ -270,7 +267,6 @@ async function runGenerations() {
 			currentPopulationBrains.push(agent.saveBrain());
 		}
 	} else {
-		log("Initialisation d'une nouvelle population aléatoire.");
 		for (let i = 0; i < currentGaParams.numIndividuals; i++) {
 			const agent = new ActorCritic(currentGaParams.learningRateActor, currentGaParams.learningRateCritic, currentGaParams.gamma, currentGaParams.numStates, currentGaParams.numActions);
 			currentPopulationBrains.push(agent.saveBrain());
@@ -278,17 +274,14 @@ async function runGenerations() {
 	}
 
 	if (currentGeneration === 0) {
-		log("Initialisation d'une nouvelle session d'entraînement.");
 		if (stateFeatureSize === 0) {
 			resetGameEnvironment();
 			stateFeatureSize = getCurrentState().stateFeatures.length;
-			log(`Taille des caractéristiques d'état déterminée : ${stateFeatureSize}`);
 		}
 
 		currentGaParams.numStates = stateFeatureSize; // S'assurer que le paramètre est à jour
 		currentPopulationBrains = [];
 		if (bestAgentInstance) {
-			log("Initialisation de la population à partir du meilleur agent existant.");
 			currentPopulationBrains.push(bestAgentInstance.saveBrain());
 			for (let i = 1; i < currentGaParams.numIndividuals; i++) {
 				const agent = new ActorCritic(currentGaParams.learningRateActor, currentGaParams.learningRateCritic, currentGaParams.gamma, currentGaParams.numStates, currentGaParams.numActions, bestAgentInstance.getActorWeights(), bestAgentInstance.getCriticWeights());
@@ -297,7 +290,6 @@ async function runGenerations() {
 				currentPopulationBrains.push(agent.saveBrain());
 			}
 		} else {
-			log("Initialisation d'une nouvelle population aléatoire.");
 			for (let i = 0; i < currentGaParams.numIndividuals; i++) {
 				const agent = new ActorCritic(currentGaParams.learningRateActor, currentGaParams.learningRateCritic, currentGaParams.gamma, currentGaParams.numStates, currentGaParams.numActions);
 				currentPopulationBrains.push(agent.saveBrain());
@@ -306,7 +298,6 @@ async function runGenerations() {
 
 		currentGeneration = 1; // On passe à la génération 1
 	} else {
-		log(`Reprise de l'entraînement à la génération ${currentGeneration}.`);
 		// Si ce n'est pas la génération 0, on ne touche ni à la population, ni au compteur.
 	}
 
@@ -316,11 +307,9 @@ async function runGenerations() {
 function runSingleGeneration(populationBrains, gaParams) {
 	if (!isTraining || (!gaParams.isInfiniteMode && generationPassed > gaParams.numGenerations)) {
 		stopTraining(false);
-		log("Entraînement terminé.");
 		return;
 	}
 
-	log(`--- Lancement Génération ${currentGeneration} ---`);
 	currentGenerationSpan.textContent = currentGeneration;
 
 	tasksPending = populationBrains.length;
@@ -341,7 +330,6 @@ function runSingleGeneration(populationBrains, gaParams) {
 }
 
 function processGenerationResults(results, gaParams) {
-	log("Évaluation de la génération terminée. Traitement des résultats...");
 
 	let bestFitnessThisGen = -Infinity;
 	let bestIndividualThisGen = null;
@@ -357,7 +345,6 @@ function processGenerationResults(results, gaParams) {
 
 	const averageFitnessThisGen = sumFitnessThisGen / results.length;
 	updateLearningCurveChart(averageFitnessThisGen);
-	log(`Récompense moyenne: ${averageFitnessThisGen.toFixed(2)}. Meilleure récompense: ${bestFitnessThisGen.toFixed(2)}`);
 
 	if (bestFitnessThisGen > bestRewardAllTime) {
 		bestRewardAllTime = bestFitnessThisGen;
@@ -371,14 +358,12 @@ function processGenerationResults(results, gaParams) {
 
 		}
 		bestAgentInstance.loadBrain(bestIndividualThisGen.agentBrain);
-		log(`Nouveau meilleur score global ! Récompense: ${bestRewardAllTime.toFixed(2)}`);
 
 		// MODIFICATION : Sauvegarde automatique dans IndexedDB
 		const dataToSave = prepareDataForSaving();
 		saveAgentToDB(dataToSave);
 	}
 
-	log("Lancement de l'évolution de la population...");
 	const evolutionWorker = workers[0];
 	const populationDataForEvolution = results.map(r => ({
 		agentBrain: r.agentBrain,
@@ -406,12 +391,10 @@ function stopTraining(fromUser = false) {
 
 	// AJOUT : Sauvegarder l'état actuel si l'arrêt est manuel et qu'un agent existe
 	if (fromUser && bestAgentInstance) {
-		log("Sauvegarde de l'état actuel sur arrêt manuel...");
 		const dataToSave = prepareDataForSaving();
 		saveAgentToDB(dataToSave);
 	}
 
-	log("Entraînement arrêté" + (fromUser ? " par l'utilisateur." : "."));
 }
 
 function getSimulationParameters() {
