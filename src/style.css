@@ -673,7 +673,7 @@ input[type="number"]:focus {
 		flex-direction: column;
 	}
 /* MODIFICATION : flex-direction column pour les wrappers sur mobile */
-	.setting-item #chartDisplayMode, .setting-item label, .settings-panel hr, .learning-curve-panel h2, .chart-container, .section-panel .learning-curve-panel{
+	.setting-item #chartDisplayMode, .setting-item label, .learning-curve-panel h2, .chart-container, .section-panel .learning-curve-panel{
 		display:none;
 	}
 
