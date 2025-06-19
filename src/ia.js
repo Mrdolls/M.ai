@@ -728,6 +728,8 @@ function prepareDataForSaving() {
 		}
 	};
 }
+
+
 function updateDisplayCurve(){
 
 	const displayMode = chartDisplayModeSelect ? chartDisplayModeSelect.value : 'realtime';
@@ -737,7 +739,7 @@ function updateDisplayCurve(){
             Plotly.restyle(learningCurveChartDiv, { y: [[]] });
         }
     // Pour les mises à jour régulières, on ne redessine qu'en mode 'temps réel'
-    if (displayMode === 'realtime') {
+    if (displayMode === 'realtime'){
 		learningCurvePanel.style.display = "flex";
         Plotly.restyle(learningCurveChartDiv, { y: [learningCurveData] });
     }
@@ -894,4 +896,7 @@ window.onload = async function () {
 		loaderOverlay.style.display = 'none';
 	}
 	updateDisplayCurve();
+	if (window.innerWidth <= 767){
+		learningCurvePanel.style.display = 'none';
+	}
 };
