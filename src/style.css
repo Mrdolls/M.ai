@@ -673,6 +673,14 @@ input[type="number"]:focus {
 		flex-direction: column;
 	}
 
+	.setting-item #chartDisplayMode, .setting-item label{
+		display:none;
+	}
+
+	.learning-curve-panel{
+		display:none;
+	}
+
 	.training-stats-panel,
 	.learning-curve-panel,
 	.test-sidebar {
