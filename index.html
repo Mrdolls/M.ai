@@ -107,6 +107,16 @@
 		<input type="number" id="numElitism" value="1" step="1" min="0">
 
 		<hr>
+		<div class="setting-item">
+			<label for="chartDisplayMode">Affichage Courbe :</label>
+			<select id="chartDisplayMode">
+				<option value="realtime" selected>Temps réel</option>
+				<option value="end_only">À la fin</option>
+				<option value="hidden">Cachée</option>
+			</select>
+		</div>
+		<hr>
+
 		<h3>Paramètres de Récompense/Pénalité</h3>
 		<label for="collectionDistanceThreshold">Seuil Coll. Distance :</label>
 		<input type="number" id="collectionDistanceThreshold" value="10" step="1" min="0">

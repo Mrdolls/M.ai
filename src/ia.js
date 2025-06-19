@@ -50,10 +50,14 @@ const modalConfirmBtn = document.getElementById('modalConfirmBtn');
 const modalCancelBtn = document.getElementById('modalCancelBtn');
 
 const learningCurveChartDiv = document.getElementById('learningCurveChart');
+// AJOUT : Référence au nouveau menu déroulant
+const chartDisplayModeSelect = document.getElementById('chartDisplayMode');
+
 
 const loaderOverlay = document.querySelector('#loader-overlay');
 const closeButton = document.querySelector('#closeButton');
 
+const learningCurvePanel = document.querySelector(".learning-curve-panel");
 // --- Paramètres du Jeu et de l'IA ---
 const SQUARE_SIZE = 30;
 let squareX = canvas.width / 2 - SQUARE_SIZE / 2;
@@ -89,6 +93,7 @@ const workers = [];
 
 const DB_NAME = 'iaTrainingDB';
 const STORE_NAME = 'bestAgentStore';
+
 
 /**
  * Ouvre la base de données IndexedDB et crée l'object store si nécessaire.
@@ -229,7 +234,11 @@ async function runGenerations() {
 	stopButton.disabled = false;
 	testBestIAButton.disabled = true;
 	isCanvasRenderingEnabled = false;
+	const displayMode = chartDisplayModeSelect ? chartDisplayModeSelect.value : 'realtime';
 	generationPassed = 1; // On passe à la générationPassed 1
+	if (displayMode !== 'hidden' && displayMode !== 'realtime'){
+		Plotly.restyle(learningCurveChartDiv, { y: [[]] });
+	}
 	if (stateFeatureSize === 0) {
 		resetGameEnvironment();
 		stateFeatureSize = getCurrentState().stateFeatures.length;
@@ -386,6 +395,10 @@ function stopTraining(fromUser = false) {
 		saveAgentToDB(dataToSave);
 	}
 
+	// MODIFICATION : Dessiner le graphique si le mode "Afficher à la fin" est sélectionné
+	if (chartDisplayModeSelect && chartDisplayModeSelect.value === 'end_only' && learningCurveData.length > 0) {
+        Plotly.restyle(learningCurveChartDiv, { y: [learningCurveData] });
+    }
 }
 
 function getSimulationParameters() {
@@ -619,15 +632,28 @@ function initLearningCurveChart() {
 	}], layout, config);
 }
 
+// MODIFICATION : La fonction gère maintenant le menu déroulant
 function updateLearningCurveChart(newReward) {
-	if (newReward === null) {
-		// Cas spécial pour redessiner le graphique avec les données existantes (après chargement)
-		Plotly.restyle(learningCurveChartDiv, { y: [learningCurveData] });
-		return;
-	}
-	learningCurveData.push(newReward);
-	Plotly.restyle(learningCurveChartDiv, { y: [learningCurveData] });
+    // Les données sont toujours collectées pour ne pas perdre l'historique
+    if (newReward !== null) {
+        learningCurveData.push(newReward);
+    }
+	const displayMode = chartDisplayModeSelect ? chartDisplayModeSelect.value : 'realtime';
+
+    // 'newReward === null' est un appel spécial (ex: chargement) pour forcer un redessinage
+    if (newReward === null) {
+        if (displayMode !== 'hidden') {
+            Plotly.restyle(learningCurveChartDiv, { y: [learningCurveData] });
+        }
+        return;
+    }
+
+    // Pour les mises à jour régulières, on ne redessine qu'en mode 'temps réel'
+    if (displayMode === 'realtime') {
+        Plotly.restyle(learningCurveChartDiv, { y: [learningCurveData] });
+    }
 }
+
 
 function resetLearningCurveChart() {
 	learningCurveData = [];
@@ -646,6 +672,8 @@ function resetSettingsToDefault() {
 	learningRateCriticInput.value = 0.005;
 	gammaInput.value = 0.99;
 	numElitismInput.value = 1;
+	if (chartDisplayModeSelect) chartDisplayModeSelect.value = 'realtime';
+
 
 	// Paramètres de Récompense/Pénalité
 	collectionDistanceThresholdInput.value = 10;
@@ -695,10 +723,28 @@ function prepareDataForSaving() {
 			learningRateCritic: learningRateCriticInput.value,
 			gamma: gammaInput.value,
 			numElitism: numElitismInput.value,
+			// AJOUT: Sauvegarde de l'état du menu déroulant
+			chartDisplayMode: chartDisplayModeSelect.value,
 		}
 	};
 }
+function updateDisplayCurve(){
 
+	const displayMode = chartDisplayModeSelect ? chartDisplayModeSelect.value : 'realtime';
+    // 'newReward === null' est un appel spécial (ex: chargement) pour forcer un redessinage
+        if (displayMode !== 'hidden') {
+			learningCurvePanel.style.display = "flex";
+            Plotly.restyle(learningCurveChartDiv, { y: [[]] });
+        }
+    // Pour les mises à jour régulières, on ne redessine qu'en mode 'temps réel'
+    if (displayMode === 'realtime') {
+		learningCurvePanel.style.display = "flex";
+        Plotly.restyle(learningCurveChartDiv, { y: [learningCurveData] });
+    }
+	if (displayMode === 'hidden') {
+		learningCurvePanel.style.display = "none";
+    }
+}
 /**
  * MODIFICATION: Applique les données chargées (d'un fichier ou d'IndexedDB) à l'état de l'application.
  * @param {object} loadedData - Les données à appliquer.
@@ -722,6 +768,10 @@ function applyLoadedData(loadedData) {
 		learningRateCriticInput.value = loadedData.settings.learningRateCritic;
 		gammaInput.value = loadedData.settings.gamma;
 		numElitismInput.value = loadedData.settings.numElitism;
+		// AJOUT: Chargement de l'état du menu déroulant
+		if (loadedData.settings.chartDisplayMode) {
+			chartDisplayModeSelect.value = loadedData.settings.chartDisplayMode;
+		}
 	}
 
 	if (stateFeatureSize === 0) {
@@ -807,6 +857,7 @@ loadButton.addEventListener('click', () => {
 	loadFileInput.click();
 });
 
+
 loadFileInput.addEventListener('change', (event) => {
 	const file = event.target.files[0];
 	if (!file) return;
@@ -824,9 +875,9 @@ loadFileInput.addEventListener('change', (event) => {
 	reader.readAsText(file);
 	event.target.value = '';
 });
-
-
-
+chartDisplayModeSelect.addEventListener('change', (event) => {
+	updateDisplayCurve();
+});
 // --- INITIALISATION ---
 window.onload = async function () {
 	initializeWorkers();
@@ -842,4 +893,5 @@ window.onload = async function () {
 	if (loaderOverlay) {
 		loaderOverlay.style.display = 'none';
 	}
+	updateDisplayCurve();
 };

@@ -501,6 +501,39 @@ input[type="number"]:focus {
 	width: 80px;
 }
 
+/* AJOUT DE STYLES POUR LE MENU DÉROULANT ET SON WRAPPER */
+.settings-panel .setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin: 5px 0;
+}
+
+.settings-panel .setting-item label {
+    white-space: normal;
+    flex-shrink: 1;
+}
+
+.settings-panel select {
+    background-color: #333333;
+    color: var(--text-light);
+    border: 1px solid var(--border-color);
+    padding: 8px 10px;
+    border-radius: 8px;
+    width: 130px; /* Largeur ajustée */
+    font-size: 14px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+	cursor: pointer;
+}
+
+.settings-panel select:focus {
+    outline: none;
+    border-color: var(--primary-color-end);
+    box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.5);
+}
+
+
 .settings-panel button {
 	padding: 15px 20px;
 	font-size: 18px;
@@ -616,6 +649,8 @@ input[type="number"]:focus {
 	-webkit-text-fill-color: transparent;
 	background-clip: text;
 }
+
+/* SUPPRESSION DE L'ANCIEN STYLE POUR .chart-controls */
 
 .chart-container {
 	width: 100%;
