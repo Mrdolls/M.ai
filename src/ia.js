@@ -236,7 +236,7 @@ async function runGenerations() {
 	isCanvasRenderingEnabled = false;
 	const displayMode = chartDisplayModeSelect ? chartDisplayModeSelect.value : 'realtime';
 	generationPassed = 1; // On passe à la générationPassed 1
-	if (displayMode !== 'hidden' && displayMode !== 'realtime'){
+	if (displayMode !== 'hidden' && displayMode !== 'realtime') {
 		Plotly.restyle(learningCurveChartDiv, { y: [[]] });
 	}
 	if (stateFeatureSize === 0) {
@@ -397,8 +397,8 @@ function stopTraining(fromUser = false) {
 
 	// MODIFICATION : Dessiner le graphique si le mode "Afficher à la fin" est sélectionné
 	if (chartDisplayModeSelect && chartDisplayModeSelect.value === 'end_only' && learningCurveData.length > 0) {
-        Plotly.restyle(learningCurveChartDiv, { y: [learningCurveData] });
-    }
+		Plotly.restyle(learningCurveChartDiv, { y: [learningCurveData] });
+	}
 }
 
 function getSimulationParameters() {
@@ -632,26 +632,34 @@ function initLearningCurveChart() {
 	}], layout, config);
 }
 
+tippy('.tooltip', {
+	content: 'Cacher la courbe pour plus de performance',
+	animation: 'fade',
+	theme: 'gradient',
+	placement: 'bottom'
+});
+
+
 // MODIFICATION : La fonction gère maintenant le menu déroulant
 function updateLearningCurveChart(newReward) {
-    // Les données sont toujours collectées pour ne pas perdre l'historique
-    if (newReward !== null) {
-        learningCurveData.push(newReward);
-    }
+	// Les données sont toujours collectées pour ne pas perdre l'historique
+	if (newReward !== null) {
+		learningCurveData.push(newReward);
+	}
 	const displayMode = chartDisplayModeSelect ? chartDisplayModeSelect.value : 'realtime';
 
-    // 'newReward === null' est un appel spécial (ex: chargement) pour forcer un redessinage
-    if (newReward === null) {
-        if (displayMode !== 'hidden') {
-            Plotly.restyle(learningCurveChartDiv, { y: [learningCurveData] });
-        }
-        return;
-    }
+	// 'newReward === null' est un appel spécial (ex: chargement) pour forcer un redessinage
+	if (newReward === null) {
+		if (displayMode !== 'hidden') {
+			Plotly.restyle(learningCurveChartDiv, { y: [learningCurveData] });
+		}
+		return;
+	}
 
-    // Pour les mises à jour régulières, on ne redessine qu'en mode 'temps réel'
-    if (displayMode === 'realtime') {
-        Plotly.restyle(learningCurveChartDiv, { y: [learningCurveData] });
-    }
+	// Pour les mises à jour régulières, on ne redessine qu'en mode 'temps réel'
+	if (displayMode === 'realtime') {
+		Plotly.restyle(learningCurveChartDiv, { y: [learningCurveData] });
+	}
 }
 
 
@@ -730,22 +738,22 @@ function prepareDataForSaving() {
 }
 
 
-function updateDisplayCurve(){
+function updateDisplayCurve() {
 
 	const displayMode = chartDisplayModeSelect ? chartDisplayModeSelect.value : 'realtime';
-    // 'newReward === null' est un appel spécial (ex: chargement) pour forcer un redessinage
-        if (displayMode !== 'hidden') {
-			learningCurvePanel.style.display = "flex";
-            Plotly.restyle(learningCurveChartDiv, { y: [[]] });
-        }
-    // Pour les mises à jour régulières, on ne redessine qu'en mode 'temps réel'
-    if (displayMode === 'realtime'){
+	// 'newReward === null' est un appel spécial (ex: chargement) pour forcer un redessinage
+	if (displayMode !== 'hidden') {
 		learningCurvePanel.style.display = "flex";
-        Plotly.restyle(learningCurveChartDiv, { y: [learningCurveData] });
-    }
+		Plotly.restyle(learningCurveChartDiv, { y: [[]] });
+	}
+	// Pour les mises à jour régulières, on ne redessine qu'en mode 'temps réel'
+	if (displayMode === 'realtime') {
+		learningCurvePanel.style.display = "flex";
+		Plotly.restyle(learningCurveChartDiv, { y: [learningCurveData] });
+	}
 	if (displayMode === 'hidden') {
 		learningCurvePanel.style.display = "none";
-    }
+	}
 }
 /**
  * MODIFICATION: Applique les données chargées (d'un fichier ou d'IndexedDB) à l'état de l'application.
@@ -830,7 +838,7 @@ resetButton.addEventListener('click', async () => {
 
 		resetGameEnvironment();
 		drawGame();
-		}
+	}
 });
 
 startButton.addEventListener('click', runGenerations);
@@ -896,7 +904,7 @@ window.onload = async function () {
 		loaderOverlay.style.display = 'none';
 	}
 	updateDisplayCurve();
-	if (window.innerWidth <= 767){
+	if (window.innerWidth <= 767) {
 		learningCurvePanel.style.display = 'none';
 	}
 };

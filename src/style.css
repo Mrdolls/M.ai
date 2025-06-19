@@ -640,6 +640,37 @@ input[type="number"]:focus {
 	min-height: 350px;
 }
 
+/* --- Thème Personnalisé "gradient" pour Tippy.js (Style final SANS FLÈCHE) --- */
+
+/* Style du conteneur principal de l'infobulle */
+.tippy-box[data-theme~='gradient'] {
+    /* FOND: Le dégradé iconique de votre site */
+    background-image: var(--primary-gradient);
+	text-align: center;
+    /* POLICE: La police "Inter" de votre site avec une couleur claire */
+    font-family: 'Inter', sans-serif;
+    color: var(--text-light);
+    font-weight: 600;
+    font-size: 16px;
+
+    /* FORME ET OMBRE: Bords arrondis et ombre profonde de votre thème */
+    border-radius: 10px;
+    box-shadow: 0 5px 20px var(--shadow-dark);
+
+    /* On retire la bordure pour un look plus épuré */
+    border: none;
+}
+
+/* MODIFICATION : On masque complètement la flèche */
+.tippy-box[data-theme~='gradient'] .tippy-arrow {
+    display: none;
+}
+
+/* Espacement intérieur du contenu */
+.tippy-box[data-theme~='gradient'] .tippy-content {
+    padding: 10px 10px;
+}
+
 .learning-curve-panel h2 {
 	margin-top: 0;
 	margin-bottom: 15px;
